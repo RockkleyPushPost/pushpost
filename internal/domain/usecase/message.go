@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"github.com/google/uuid"
-	"pushpost/internal/dto"
+	"pushpost/internal/domain/dto"
 	"pushpost/internal/entity"
 	"pushpost/internal/repository"
 )

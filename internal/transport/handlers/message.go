@@ -2,9 +2,9 @@ package transport
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"pushpost/internal/dto"
+	"pushpost/internal/domain/dto"
+	"pushpost/internal/domain/usecase"
 	"pushpost/internal/entity"
-	"pushpost/internal/usecase"
 )
 
 type MessagesHandler struct {
