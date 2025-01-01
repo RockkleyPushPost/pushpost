@@ -6,7 +6,10 @@ import (
 	"unicode/utf8"
 )
 
-const MinContentLength = 1
+const (
+	MinContentLength = 1
+	MaxContentLength = 255
+)
 
 type CreateMessageDTO struct {
 	SenderUUID   uuid.UUID `json:"senderUUID"`
@@ -22,7 +25,7 @@ func (dto *CreateMessageDTO) Validate() error {
 		return errors.New("invalid receiver uuid")
 	}
 	contentLength := utf8.RuneCountInString(dto.Content)
-	if contentLength < MinContentLength {
+	if contentLength < MinContentLength || contentLength > MaxContentLength {
 		return errors.New("invalid content length")
 	}
 	return nil

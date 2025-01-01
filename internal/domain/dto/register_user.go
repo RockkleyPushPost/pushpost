@@ -11,8 +11,16 @@ import (
 const (
 	MinNameLength     = 2
 	MaxNameLength     = 32
+	MinAge            = 0
+	MaxAge            = 150
 	MinPasswordLength = 6
+	MaxPasswordLength = 64
 	EmailRegex        = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
+)
+
+type (
+	UserDataCheckList map[string]bool
+	PasswordCheckList map[string]bool
 )
 
 type RegisterUserDTO struct {
@@ -23,17 +31,12 @@ type RegisterUserDTO struct {
 }
 
 func (dto *RegisterUserDTO) Validate() error {
-	length := utf8.RuneCountInString(dto.Name)
-	if length < MinNameLength || length > MaxNameLength {
-		return errors.New("invalid name length")
-	}
+	dto.Name = strings.TrimSpace(dto.Name)
+	dto.Email = strings.TrimSpace(dto.Email)
+	dto.Password = strings.TrimSpace(dto.Password)
 
-	if dto.Age < 0 {
-		return errors.New("invalid age")
-	}
-
-	if !isEmailValid(dto.Email) {
-		return errors.New("invalid email")
+	if isValid, userDataError := validateUserData(*dto); !isValid {
+		return errors.New(userDataError)
 	}
 
 	if isValid, passwordError := validatePassword(dto.Password); !isValid {
@@ -42,34 +45,66 @@ func (dto *RegisterUserDTO) Validate() error {
 	return nil
 }
 
-func isEmailValid(e string) bool {
-	emailRegex := regexp.MustCompile(EmailRegex)
-	return emailRegex.MatchString(e)
-}
-func validatePassword(password string) (bool, string) {
-	if utf8.RuneCountInString(password) < MinPasswordLength {
-		return false, fmt.Sprintf("password must be at least %d symbols long", MinPasswordLength)
-	}
-	passError := make([]string, 0, 3)
-	validations := make(map[string]bool)
+func validateUserData(data RegisterUserDTO) (bool, string) {
+	check := checkUserData(data)
 
-	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
-	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
-	hasDigit := regexp.MustCompile(`[0-9]`).MatchString(password)
+	dataMissingRequirements := make([]string, 0, len(*check))
 
-	validations["uppercase symbol(s)"] = hasUpper
-	validations["lowercase symbol(s)"] = hasLower
-	validations["digits"] = hasDigit
-
-	for k, v := range validations {
-		if !v {
-			passError = append(passError, k)
+	for str, req := range *check {
+		if !req {
+			dataMissingRequirements = append(dataMissingRequirements, str)
 		}
 	}
 
-	if len(passError) == 0 {
-		return true, ""
+	if len(dataMissingRequirements) > 0 {
+		return false, strings.Join(dataMissingRequirements, ", ")
 	}
 
-	return false, "password must also contain " + strings.Join(passError, ", ")
+	return true, ""
+}
+
+func validatePassword(password string) (bool, string) {
+	check := checkPassword(password)
+
+	passwordMissingRequirements := make([]string, 0, len(*check))
+
+	for str, req := range *check {
+		if !req {
+			passwordMissingRequirements = append(passwordMissingRequirements, str)
+		}
+	}
+
+	if len(passwordMissingRequirements) > 0 {
+		return false, "password must also contain " + strings.Join(passwordMissingRequirements, ", ")
+	}
+
+	return true, ""
+}
+func checkUserData(dto RegisterUserDTO) *UserDataCheckList {
+	nameLen := utf8.RuneCountInString(dto.Name)
+	nameLengthMsg := fmt.Sprintf("name must be from %d to %d characters long", MinNameLength, MaxNameLength)
+	ageMsg := fmt.Sprintf("age must be from %d to %d", MinAge, MaxAge)
+
+	return &UserDataCheckList{
+		nameLengthMsg:   nameLen >= MinNameLength && nameLen <= MaxNameLength,
+		ageMsg:          dto.Age > MinAge && dto.Age < MaxAge,
+		"invalid email": isEmailValid(strings.TrimSpace(dto.Email)),
+	}
+}
+
+func checkPassword(password string) *PasswordCheckList {
+	passwordLength := utf8.RuneCountInString(password)
+	lengthMsg := fmt.Sprintf("from %d to %d symbols", MinPasswordLength, MaxPasswordLength)
+
+	return &PasswordCheckList{
+		"uppercase symbol(s)": regexp.MustCompile(`[A-Z]`).MatchString(password),
+		"lowercase symbol(s)": regexp.MustCompile(`[a-z]`).MatchString(password),
+		"digits":              regexp.MustCompile(`[0-9]`).MatchString(password),
+		lengthMsg:             passwordLength > MinPasswordLength && passwordLength < MaxPasswordLength,
+	}
+}
+
+func isEmailValid(e string) bool {
+	emailRegex := regexp.MustCompile(EmailRegex)
+	return emailRegex.MatchString(e)
 }
