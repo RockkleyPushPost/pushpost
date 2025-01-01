@@ -18,10 +18,8 @@ const (
 	EmailRegex        = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 )
 
-type (
-	UserDataCheckList map[string]bool
-	PasswordCheckList map[string]bool
-)
+// CheckList is used to construct informative messages if the data is not valid
+type CheckList map[string]bool
 
 type RegisterUserDTO struct {
 	Name     string `json:"name"`
@@ -80,23 +78,23 @@ func validatePassword(password string) (bool, string) {
 
 	return true, ""
 }
-func checkUserData(dto RegisterUserDTO) *UserDataCheckList {
+func checkUserData(dto RegisterUserDTO) *CheckList {
 	nameLen := utf8.RuneCountInString(dto.Name)
 	nameLengthMsg := fmt.Sprintf("name must be from %d to %d characters long", MinNameLength, MaxNameLength)
 	ageMsg := fmt.Sprintf("age must be from %d to %d", MinAge, MaxAge)
 
-	return &UserDataCheckList{
+	return &CheckList{
 		nameLengthMsg:   nameLen >= MinNameLength && nameLen <= MaxNameLength,
 		ageMsg:          dto.Age > MinAge && dto.Age < MaxAge,
 		"invalid email": isEmailValid(strings.TrimSpace(dto.Email)),
 	}
 }
 
-func checkPassword(password string) *PasswordCheckList {
+func checkPassword(password string) *CheckList {
 	passwordLength := utf8.RuneCountInString(password)
 	lengthMsg := fmt.Sprintf("from %d to %d symbols", MinPasswordLength, MaxPasswordLength)
 
-	return &PasswordCheckList{
+	return &CheckList{
 		"uppercase symbol(s)": regexp.MustCompile(`[A-Z]`).MatchString(password),
 		"lowercase symbol(s)": regexp.MustCompile(`[a-z]`).MatchString(password),
 		"digits":              regexp.MustCompile(`[0-9]`).MatchString(password),
