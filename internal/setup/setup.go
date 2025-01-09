@@ -4,6 +4,7 @@ import (
 	"log"
 	"pushpost/internal/config"
 	"pushpost/internal/di"
+	"pushpost/internal/transport/routing"
 )
 
 func Setup(conf config.Config) (*di.Container, error) {
@@ -13,17 +14,12 @@ func Setup(conf config.Config) (*di.Container, error) {
 	}
 
 	fiber := NewFiber(&conf.Fiber)
-
 	ci := di.ContainerItems{Database: database, Fiber: fiber}
 	container := di.NewContainer(ci)
 
-	messageHandlers := fiber.Group("/message")
-	userHandlers := fiber.Group("/user")
-
-	messageHandlers.Post("/create", container.MessageHandler.CreateMessage)
-	messageHandlers.Get("/getByUuid", container.MessageHandler.GetMessagesByUserUUID)
-	userHandlers.Post("/register", container.UserHandler.RegisterUser)
+	routing.SetupRoutes(fiber, *container)
 
 	log.Fatal(fiber.Listen(":8080"))
+
 	return container, nil
 }

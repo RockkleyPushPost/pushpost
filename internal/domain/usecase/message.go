@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 	"pushpost/internal/domain/dto"
 	"pushpost/internal/entity"
-	"pushpost/internal/repository"
+	"pushpost/internal/storage/repository"
 )
 
 type MessageUseCase struct {

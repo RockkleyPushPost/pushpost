@@ -48,6 +48,7 @@ func validateUserData(data RegisterUserDTO) (bool, string) {
 
 	dataMissingRequirements := make([]string, 0, len(*check))
 
+	// Collecting information about missing requirements
 	for str, req := range *check {
 		if !req {
 			dataMissingRequirements = append(dataMissingRequirements, str)
@@ -66,6 +67,7 @@ func validatePassword(password string) (bool, string) {
 
 	passwordMissingRequirements := make([]string, 0, len(*check))
 
+	// Collecting information about missing requirements
 	for str, req := range *check {
 		if !req {
 			passwordMissingRequirements = append(passwordMissingRequirements, str)

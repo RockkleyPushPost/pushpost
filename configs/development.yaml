@@ -1,0 +1,9 @@
+database:
+  host: "localhost"
+  port: 5432
+  user: "pushpost"
+  password: "pushword"
+  db_name: "pushpost"
+
+fiber:
+  app_name: "PushPost"

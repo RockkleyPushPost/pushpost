@@ -3,9 +3,9 @@ package di
 import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
-	usecase2 "pushpost/internal/domain/usecase"
+	"pushpost/internal/domain/usecase"
 	"pushpost/internal/entity"
-	"pushpost/internal/repository"
+	repository2 "pushpost/internal/storage/repository"
 	transport "pushpost/internal/transport/handlers"
 )
 
@@ -15,20 +15,20 @@ type ContainerItems struct {
 }
 
 type Container struct {
-	UserRepository    *repository.UserRepository
-	MessageRepository *repository.MessageRepository
-	UserUseCase       *usecase2.UserUseCase
-	MessageUseCase    *usecase2.MessageUseCase
+	UserRepository    *repository2.UserRepository
+	MessageRepository *repository2.MessageRepository
+	UserUseCase       *usecase.UserUseCase
+	MessageUseCase    *usecase.MessageUseCase
 	MessageHandler    *transport.MessagesHandler
 	UserHandler       *transport.UserHandler
 }
 
 func NewContainer(ci ContainerItems) *Container {
-	userRepo := repository.UserRepository{DB: ci.Database}
-	messageRepo := repository.MessageRepository{DB: ci.Database}
+	userRepo := repository2.UserRepository{DB: ci.Database}
+	messageRepo := repository2.MessageRepository{DB: ci.Database}
 
-	userUseCase := usecase2.UserUseCase{UserRepo: userRepo}
-	messageUseCase := usecase2.MessageUseCase{MessageRepo: messageRepo}
+	userUseCase := usecase.UserUseCase{UserRepo: userRepo}
+	messageUseCase := usecase.MessageUseCase{MessageRepo: messageRepo}
 
 	messageHandler := transport.NewMessagesHandler(messageUseCase)
 	userHandler := transport.RegisterUserHandler(userUseCase)
