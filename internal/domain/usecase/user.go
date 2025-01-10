@@ -3,16 +3,18 @@ package usecase
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"pushpost/internal/domain/dto"
 	"pushpost/internal/entity"
-	"pushpost/internal/service"
-	repository2 "pushpost/internal/storage/repository"
+	"pushpost/internal/storage/repository"
+	"pushpost/pkg/jwt"
 )
 
 type UserUseCase struct {
-	UserRepo    repository2.UserRepository
-	JWTService  *service.JWTService
-	MessageRepo repository2.MessageRepository
+	UserRepo    repository.UserRepository
+	jwtSecret   string
+	MessageRepo repository.MessageRepository
 }
 
 func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) (err error) {
@@ -27,7 +29,11 @@ func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) (err error) {
 		Password: dto.Password,
 		Age:      dto.Age,
 	}
-
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.Password = string(hashedPassword)
 	if err = u.UserRepo.RegisterUser(&user); err != nil {
 		return
 	}
@@ -42,11 +48,14 @@ func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("login failed: %w ", err)
 	}
-
-	token, err := u.JWTService.GenerateToken(user.UUID)
-	if err != nil {
-		return "", fmt.Errorf("token generation failed: %w", err)
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password)); err != nil {
+		return "", err
 	}
 
+	token, err := jwt.GenerateToken(user.UUID, u.jwtSecret)
+	if err != nil {
+		log.Printf("Error generating token: %v", err)
+		return "", err
+	}
 	return token, nil
 }

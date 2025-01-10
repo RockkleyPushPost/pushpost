@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func AuthMiddleware(jwtSecret string) fiber.Handler {
+func AuthJWTMiddleware(jwtSecret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
