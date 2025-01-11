@@ -1,45 +1,59 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
+	"log"
+	"pushpost/pkg/jwt"
 	"strings"
 )
 
-func AuthJWTMiddleware(jwtSecret string) fiber.Handler {
+func AuthJWTMiddleware(secret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		// Get Authorization header
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Missing authorization header",
+				"error": "Authorization header missing",
 			})
 		}
-
-		bearerToken := strings.Split(authHeader, " ")
-		if len(bearerToken) != 2 || bearerToken[0] != "Bearer" {
+		parts := strings.Split(authHeader, " ")
+		if len(parts) != 2 || parts[0] != "Bearer" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Invalid token format",
+				"error": "Invalid Authorization header format",
 			})
 		}
-
-		token := bearerToken[1]
-		claims := jwt.MapClaims{}
-
-		parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
-			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-			}
-			return []byte(jwtSecret), nil
-		})
-
-		if err != nil || !parsedToken.Valid {
+		token := parts[1]
+		claims, err := jwt.VerifyToken(token, secret)
+		if err != nil {
+			log.Printf("Token verification failed: %v", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid or expired token",
 			})
 		}
 
-		c.Locals("user_id", claims["user_id"])
+		rawUUID, ok := claims["userUUID"].(string)
+		if !ok {
+			log.Println("User UUID not found in token claims")
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Invalid token claims",
+			})
+		}
+
+		userUUID, err := uuid.Parse(rawUUID)
+		if err != nil {
+			log.Printf("Invalid UUID format: %v", err)
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Invalid token claims",
+			})
+		}
+
+		log.Printf("User UUID from token: %s", userUUID)
+
+		// Store the userUUID in Fiber's context
+		c.Locals("userUUID", userUUID)
+
+		// Proceed to the next handler
 		return c.Next()
 	}
 }

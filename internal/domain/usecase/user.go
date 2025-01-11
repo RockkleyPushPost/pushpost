@@ -13,7 +13,7 @@ import (
 
 type UserUseCase struct {
 	UserRepo    repository.UserRepository
-	jwtSecret   string
+	JwtSecret   string
 	MessageRepo repository.MessageRepository
 }
 
@@ -52,7 +52,7 @@ func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 		return "", err
 	}
 
-	token, err := jwt.GenerateToken(user.UUID, u.jwtSecret)
+	token, err := jwt.GenerateToken(user.UUID, u.JwtSecret)
 	if err != nil {
 		log.Printf("Error generating token: %v", err)
 		return "", err

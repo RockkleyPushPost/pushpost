@@ -27,7 +27,7 @@ func NewContainer(ci ContainerItems) *Container {
 	userRepo := repository2.UserRepository{DB: ci.Database}
 	messageRepo := repository2.MessageRepository{DB: ci.Database}
 
-	userUseCase := usecase.UserUseCase{UserRepo: userRepo}
+	userUseCase := usecase.UserUseCase{UserRepo: userRepo, JwtSecret: "shenanigans"}
 	messageUseCase := usecase.MessageUseCase{MessageRepo: messageRepo}
 
 	messageHandler := transport.NewMessagesHandler(messageUseCase)

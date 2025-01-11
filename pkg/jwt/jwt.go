@@ -11,7 +11,7 @@ const tokenExpTime = time.Hour * 24
 
 func GenerateToken(userUuid uuid.UUID, secret string) (string, error) {
 	claims := jwt.MapClaims{
-		"userUuid": userUuid,
+		"userUUID": userUuid,
 		"exp":      time.Now().Add(tokenExpTime).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
