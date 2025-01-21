@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 	"pushpost/internal/domain/usecase"
 	"pushpost/internal/entity"
-	repository2 "pushpost/internal/storage/repository"
-	transport "pushpost/internal/transport/handlers"
+	"pushpost/internal/storage/repository"
+	"pushpost/internal/transport/handlers"
 )
 
 type ContainerItems struct {
@@ -15,8 +15,8 @@ type ContainerItems struct {
 }
 
 type Container struct {
-	UserRepository    *repository2.UserRepository
-	MessageRepository *repository2.MessageRepository
+	UserRepository    *repository.UserRepository
+	MessageRepository *repository.MessageRepository
 	UserUseCase       *usecase.UserUseCase
 	MessageUseCase    *usecase.MessageUseCase
 	MessageHandler    *transport.MessagesHandler
@@ -24,8 +24,8 @@ type Container struct {
 }
 
 func NewContainer(ci ContainerItems) *Container {
-	userRepo := repository2.UserRepository{DB: ci.Database}
-	messageRepo := repository2.MessageRepository{DB: ci.Database}
+	userRepo := repository.UserRepository{DB: ci.Database}
+	messageRepo := repository.MessageRepository{DB: ci.Database}
 
 	userUseCase := usecase.UserUseCase{UserRepo: userRepo, JwtSecret: "shenanigans"}
 	messageUseCase := usecase.MessageUseCase{MessageRepo: messageRepo}

@@ -10,7 +10,6 @@ import (
 
 func AuthJWTMiddleware(secret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Get Authorization header
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -26,7 +25,7 @@ func AuthJWTMiddleware(secret string) fiber.Handler {
 		token := parts[1]
 		claims, err := jwt.VerifyToken(token, secret)
 		if err != nil {
-			log.Printf("Token verification failed: %v", err)
+			//log.Printf("Token verification failed: %v", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid or expired token",
 			})
@@ -48,12 +47,10 @@ func AuthJWTMiddleware(secret string) fiber.Handler {
 			})
 		}
 
-		log.Printf("User UUID from token: %s", userUUID)
+		//log.Printf("User UUID from token: %s", userUUID)
 
-		// Store the userUUID in Fiber's context
 		c.Locals("userUUID", userUUID)
 
-		// Proceed to the next handler
 		return c.Next()
 	}
 }

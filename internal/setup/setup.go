@@ -14,6 +14,7 @@ func Setup(conf config.Config) (*di.Container, error) {
 	}
 
 	fiber := NewFiber(&conf.Fiber)
+
 	ci := di.ContainerItems{Database: database, Fiber: fiber}
 	container := di.NewContainer(ci)
 
