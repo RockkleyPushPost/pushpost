@@ -17,56 +17,68 @@ func RegisterUserHandler(useCase usecase.UserUseCase) *UserHandler {
 }
 
 func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
-	var data entity.User
+	var body entity.User
 
-	if err := c.BodyParser(&data); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	params := dto.RegisterUserDTO{
-		Name:     data.Name,
-		Email:    data.Email,
-		Password: data.Password,
-		Age:      data.Age,
+		Name:     body.Name,
+		Email:    body.Email,
+		Password: body.Password,
+		Age:      body.Age,
 	}
 
 	if err := params.Validate(); err != nil {
 
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	err := h.useCase.RegisterUser(&params)
 
 	if err != nil {
 
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.Status(201).JSON(fiber.Map{"message": "User created successfully"})
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User created successfully"})
 }
 
 func (h *UserHandler) GetUserByUUID(c *fiber.Ctx) error {
-	var data entity.User
-	if err := c.BodyParser(&data); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	var body entity.User
+
+	if err := c.BodyParser(&body); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	user, err := h.useCase.GetByUUID(data.UUID)
+
+	user, err := h.useCase.GetByUUID(body.UUID)
+
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(200).JSON(user)
+
+	return c.Status(fiber.StatusFound).JSON(user)
 }
 
 func (h *UserHandler) GetUserByEmail(c *fiber.Ctx) error {
-	var data entity.User
-	if err := c.BodyParser(&data); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	var body entity.User
+
+	if err := c.BodyParser(&body); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	user, err := h.useCase.GetByEmail(data.Email)
+
+	user, err := h.useCase.GetByEmail(body.Email)
+
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	return c.Status(200).JSON(user)
 }
 
@@ -74,15 +86,17 @@ func (h *UserHandler) GetByToken(c *fiber.Ctx) error {
 	userUUID := c.Locals("userUUID").(uuid.UUID)
 
 	user, err := h.useCase.GetByUUID(userUUID)
-	userData := dto.UserDataByUUID{Name: user.Name, Age: user.Age}
 
 	if err != nil {
+
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "User not found",
+			"error": err.Error(),
 		})
 	}
 
-	return c.Status(200).JSON(userData)
+	userData := dto.UserDataByUUID{Name: user.Name, Age: user.Age}
+
+	return c.Status(fiber.StatusOK).JSON(userData)
 }
 
 func (h *UserHandler) Login(c *fiber.Ctx) error {

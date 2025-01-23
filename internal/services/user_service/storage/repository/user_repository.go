@@ -25,9 +25,12 @@ func (r *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
 
 func (r *UserRepository) GetUserByUUID(uuid uuid.UUID) (*entity.User, error) {
 	var user entity.User
+
 	if err := r.DB.Where("uuid = ?", uuid).First(&user).Error; err != nil {
+
 		return nil, err
 	}
+
 	return &user, nil
 }
 
