@@ -3,17 +3,18 @@ package transport
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"pushpost/internal/services/user_service/domain"
 	"pushpost/internal/services/user_service/domain/dto"
-	"pushpost/internal/services/user_service/domain/usecase"
 	"pushpost/internal/services/user_service/entity"
 )
 
 type UserHandler struct {
-	useCase *usecase.UserUseCase
+	useCase domain.UserUseCase
 }
 
-func RegisterUserHandler(useCase usecase.UserUseCase) *UserHandler {
-	return &UserHandler{useCase: &useCase}
+func RegisterUserHandler(useCase domain.UserUseCase) *UserHandler {
+
+	return &UserHandler{useCase: useCase}
 }
 
 func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {

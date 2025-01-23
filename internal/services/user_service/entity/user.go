@@ -22,6 +22,7 @@ type User struct {
 
 func NewUser(dto dto.RegisterUserDTO) (*User, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
+
 	if err != nil {
 
 		return nil, err

@@ -9,7 +9,9 @@ import (
 
 func Setup(conf config.Config) (*di.Container, error) {
 	database, err := Database(&conf.Database)
+
 	if err != nil {
+
 		return nil, err
 	}
 
