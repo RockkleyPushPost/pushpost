@@ -1,10 +1,13 @@
 package domain
 
 import (
-	dto2 "pushpost/internal/services/user_service/domain/dto"
+	"github.com/google/uuid"
+	"pushpost/internal/services/user_service/domain/dto"
+	"pushpost/internal/services/user_service/entity"
 )
 
 type UserUseCase interface {
-	RegisterUser(dto *dto2.RegisterUserDTO) (err error)
-	Login(dto dto2.UserLoginDTO) (string, error)
+	RegisterUser(dto *dto.RegisterUserDTO) (err error)
+	Login(dto dto.UserLoginDTO) (string, error)
+	GetByUUID(uuid uuid.UUID) (*entity.User, error)
 }

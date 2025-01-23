@@ -5,16 +5,20 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"pushpost/internal/services/user_service/domain"
 	"pushpost/internal/services/user_service/domain/dto"
 	"pushpost/internal/services/user_service/entity"
-	"pushpost/internal/services/user_service/storage/repository"
+	"pushpost/internal/services/user_service/storage"
 	"pushpost/pkg/jwt"
 )
 
+// implementation check
+var _ domain.UserUseCase = &UserUseCase{}
+
 type UserUseCase struct {
-	UserRepo  repository.UserRepository
+	UserRepo  storage.UserRepository
 	JwtSecret string
-	//errChan chan error TODO try err chan with panic ?
+	//errChan chan error TODO (try err chan with panic ?)
 }
 
 func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) error {
@@ -59,7 +63,7 @@ func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 	token, err := jwt.GenerateToken(user.UUID, u.JwtSecret)
 
 	if err != nil {
-		log.Printf("Error generating token: %v", err)
+		log.Printf("error generating token: %v", err)
 
 		return "", err
 	}
@@ -68,15 +72,17 @@ func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 }
 
 func (u *UserUseCase) GetByUUID(uuid uuid.UUID) (*entity.User, error) {
+
 	return u.UserRepo.GetUserByUUID(uuid)
 }
 
 func (u *UserUseCase) GetByEmail(email string) (*entity.User, error) {
+
 	return u.UserRepo.GetUserByEmail(email)
 }
 
 func (u *UserUseCase) sendVerificationEmail(email string, verificationToken string) {
-
+	// TODO
 }
 
 //func (u *UserUseCase) AddFriend(userUUID uuid.UUID, email string) error {

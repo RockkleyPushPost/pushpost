@@ -34,12 +34,15 @@ func (dto *RegisterUserDTO) Validate() error {
 	dto.Password = strings.TrimSpace(dto.Password)
 
 	if isValid, userDataError := validateUserData(*dto); !isValid {
+
 		return errors.New(userDataError)
 	}
 
 	if isValid, passwordError := validatePassword(dto.Password); !isValid {
+
 		return errors.New(passwordError)
 	}
+
 	return nil
 }
 
@@ -75,6 +78,7 @@ func validatePassword(password string) (bool, string) {
 	}
 
 	if len(passwordMissingRequirements) > 0 {
+
 		return false, "password must also contain " + strings.Join(passwordMissingRequirements, ", ")
 	}
 
@@ -88,7 +92,7 @@ func checkUserData(dto RegisterUserDTO) *CheckList {
 	return &CheckList{
 		nameLengthMsg:   nameLen >= MinNameLength && nameLen <= MaxNameLength,
 		ageMsg:          dto.Age > MinAge && dto.Age < MaxAge,
-		"invalid email": isEmailValid(strings.TrimSpace(dto.Email)),
+		"invalid email": isEmailValid(dto.Email),
 	}
 }
 
@@ -105,6 +109,8 @@ func checkPassword(password string) *CheckList {
 }
 
 func isEmailValid(e string) bool {
+
 	emailRegex := regexp.MustCompile(EmailRegex)
-	return emailRegex.MatchString(e)
+
+	return emailRegex.MatchString(strings.TrimSpace(e))
 }

@@ -1,10 +1,12 @@
 package storage
 
 import (
-	entity2 "pushpost/internal/services/user_service/entity"
+	"github.com/google/uuid"
+	"pushpost/internal/services/user_service/entity"
 )
 
 type UserRepository interface {
-	RegisterUser(user *entity2.User) error
-	GetUserByEmail(email string) (*entity2.User, error)
+	RegisterUser(user *entity.User) error
+	GetUserByEmail(email string) (*entity.User, error)
+	GetUserByUUID(uuid uuid.UUID) (*entity.User, error)
 }
