@@ -15,7 +15,11 @@ func Setup(conf config.Config) (*di.Container, error) {
 
 	fiber := NewFiber(&conf.Fiber)
 
-	ci := di.ContainerItems{Database: database, Fiber: fiber}
+	ci := di.ContainerItems{
+		Database: database,
+		Server:   fiber,
+	}
+
 	container := di.NewContainer(ci)
 
 	routing.SetupRoutes(fiber, *container)

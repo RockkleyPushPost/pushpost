@@ -2,9 +2,10 @@ package usecase
 
 import (
 	"github.com/google/uuid"
-	"pushpost/internal/domain/dto"
-	"pushpost/internal/entity"
-	"pushpost/internal/storage/repository"
+	"pushpost/internal/services/message_service/domain/dto"
+	"pushpost/internal/services/message_service/entity"
+	"pushpost/internal/services/message_service/storage/repository"
+	entity2 "pushpost/internal/services/user_service/entity"
 )
 
 type MessageUseCase struct {
@@ -27,7 +28,7 @@ func (uc *MessageUseCase) CreateMessage(dto *dto.CreateMessageDTO) (err error) {
 	return
 }
 
-func (uc *MessageUseCase) GetMessagesByUserUUID(user entity.User) (messages []entity.Message, err error) {
+func (uc *MessageUseCase) GetMessagesByUserUUID(user entity2.User) (messages []entity.Message, err error) {
 	messages, err = uc.MessageRepo.GetMessagesByUserUUID(user.UUID)
 	if err != nil {
 		return

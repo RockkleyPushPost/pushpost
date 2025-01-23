@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	config := &Config{}
+	var config Config
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -25,5 +25,5 @@ func LoadConfig(path string) (*Config, error) {
 	if err := decoder.Decode(config); err != nil {
 		return nil, err
 	}
-	return config, nil
+	return &config, nil
 }

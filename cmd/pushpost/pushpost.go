@@ -1,20 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"pushpost/internal/app"
 	"pushpost/internal/config"
-	"pushpost/internal/setup"
 )
 
 func main() {
 	conf, err := config.LoadConfig("configs/development.yaml")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
-	_, err = setup.Setup(*conf)
 
-	if err != nil {
-		fmt.Println(err)
-	}
+	app.Run(conf)
 
 }

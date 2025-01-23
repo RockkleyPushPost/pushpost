@@ -8,5 +8,6 @@ import (
 func NewFiber(fiberConfig *fiber.Config) *fiber.App {
 	app := fiber.New(*fiberConfig)
 	app.Use(cors.New())
+
 	return app
 }

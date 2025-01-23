@@ -5,5 +5,9 @@ database:
   password: "pushword"
   db_name: "pushpost"
 
+server:
+  address: "localhost"
+  port: 8080
+
 fiber:
   app_name: "PushPost"

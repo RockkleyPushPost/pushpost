@@ -3,9 +3,9 @@ package transport
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"pushpost/internal/domain/dto"
-	"pushpost/internal/domain/usecase"
-	"pushpost/internal/entity"
+	"pushpost/internal/services/user_service/domain/dto"
+	"pushpost/internal/services/user_service/domain/usecase"
+	"pushpost/internal/services/user_service/entity"
 )
 
 type UserHandler struct {
@@ -17,11 +17,13 @@ func RegisterUserHandler(useCase usecase.UserUseCase) *UserHandler {
 }
 
 func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
-
 	var data entity.User
+
 	if err := c.BodyParser(&data); err != nil {
+
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	params := dto.RegisterUserDTO{
 		Name:     data.Name,
 		Email:    data.Email,
@@ -29,10 +31,18 @@ func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
 		Age:      data.Age,
 	}
 
-	err := h.useCase.RegisterUser(&params)
-	if err != nil {
+	if err := params.Validate(); err != nil {
+
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	err := h.useCase.RegisterUser(&params)
+
+	if err != nil {
+
+		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	}
+
 	return c.Status(201).JSON(fiber.Map{"message": "User created successfully"})
 }
 
@@ -77,14 +87,18 @@ func (h *UserHandler) GetByToken(c *fiber.Ctx) error {
 
 func (h *UserHandler) Login(c *fiber.Ctx) error {
 	var loginRequest dto.UserLoginDTO
+
 	if err := c.BodyParser(&loginRequest); err != nil {
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request format",
 		})
 	}
 
 	token, err := h.useCase.Login(loginRequest)
+
 	if err != nil {
+
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -103,15 +117,19 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 	}
 
 	if err := c.BodyParser(&friendshipRequest); err != nil {
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request format",
 		})
 	}
 
-	//err := h.useCase.AddFriend(email)
-	//if err != nil {
-	//	return c.Status(400).JSON(fiber.Map{"error": err.Error()})
-	//}
-	return c.Status(201).JSON(fiber.Map{"message": "Friendship created successfully"})
+	err := h.useCase.AddFriend(email)
+
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship created successfully"})
 
 }

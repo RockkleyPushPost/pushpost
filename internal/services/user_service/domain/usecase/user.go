@@ -5,46 +5,27 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"pushpost/internal/domain/dto"
-	"pushpost/internal/entity"
-	"pushpost/internal/storage/repository"
+	"pushpost/internal/services/user_service/domain/dto"
+	"pushpost/internal/services/user_service/entity"
+	"pushpost/internal/services/user_service/storage/repository"
 	"pushpost/pkg/jwt"
 )
 
 type UserUseCase struct {
-	UserRepo    repository.UserRepository
-	JwtSecret   string
-	MessageRepo repository.MessageRepository
+	UserRepo  repository.UserRepository
+	JwtSecret string
+	//errChan chan error TODO try err chan with panic ?
 }
 
-func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) (err error) {
-
-	if err = dto.Validate(); err != nil {
-		return
-	}
-
-	verificationToken := uuid.New().String()
-
-	user := entity.User{
-		UUID:              uuid.New(),
-		Name:              dto.Name,
-		Email:             dto.Email,
-		Password:          dto.Password,
-		Age:               dto.Age,
-		IsEmailVerified:   false,
-		VerificationToken: verificationToken,
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) error {
+	user, err := entity.NewUser(*dto)
 
 	if err != nil {
 
 		return err
 	}
 
-	user.Password = string(hashedPassword)
-
-	if err = u.UserRepo.RegisterUser(&user); err != nil {
+	if err = u.UserRepo.RegisterUser(user); err != nil {
 
 		return err
 	}
@@ -53,23 +34,33 @@ func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) (err error) {
 	//
 	//	return err
 	//}
-	return
+
+	return nil
 }
 
 func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 	if err := dto.Validate(); err != nil {
+
 		return "", err
 	}
+
 	user, err := u.UserRepo.GetUserByEmail(dto.Email)
+
 	if err != nil {
+
 		return "", fmt.Errorf("login failed: %w ", err)
 	}
+
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password)); err != nil {
+
 		return "", err
 	}
+
 	token, err := jwt.GenerateToken(user.UUID, u.JwtSecret)
+
 	if err != nil {
 		log.Printf("Error generating token: %v", err)
+
 		return "", err
 	}
 	//fmt.Printf("User %s logged in, password %s", user.Email, user.Password)
