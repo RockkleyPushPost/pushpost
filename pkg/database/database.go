@@ -35,18 +35,25 @@ func (c *Config) Validate() error {
 }
 func NewDatabase(config Config) (*gorm.DB, error) {
 	if err := config.Validate(); err != nil {
+
 		return nil, err
 	}
+
 	dsn := getDsnFromConfig(config)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
 	if err != nil {
+
 		return nil, err
 	}
+
 	return db, nil
 
 }
 
 func getDsnFromConfig(config Config) string {
+
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
 		config.Host, config.User, config.Password, config.DbName, config.Port)
 }

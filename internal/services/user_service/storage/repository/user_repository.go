@@ -39,7 +39,7 @@ func (r *UserRepository) GetUserByUUID(uuid uuid.UUID) (*entity.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) AddFriend(userUUID, friendEmail string) error {
+func (r *UserRepository) AddFriend(userUUID uuid.UUID, friendEmail string) error {
 	var existingFriendship entity.Friendship
 
 	user, err := r.GetUserByUUID(userUUID)

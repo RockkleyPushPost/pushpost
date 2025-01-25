@@ -1,8 +1,6 @@
 package di
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 	"pushpost/internal/services/message_service/domain/usecase"
 	"pushpost/internal/services/message_service/entity"
 	"pushpost/internal/services/message_service/storage/repository"
@@ -10,20 +8,19 @@ import (
 	"pushpost/internal/services/user_service/entity"
 	"pushpost/internal/services/user_service/storage/repository"
 	"pushpost/internal/services/user_service/transport/handlers"
+	"sync"
 )
 
-type ContainerItems struct {
-	Database *gorm.DB
-	Server   *fiber.App
+type Container struct {
+	instances []any
+	mu        sync.Mutex
 }
 
-type Container struct {
-	UserRepository    *repository.UserRepository
-	MessageRepository *repository.MessageRepository
-	UserUseCase       *usecase.UserUseCase
-	MessageUseCase    *usecase.MessageUseCase
-	MessageHandler    *transport.MessagesHandler
-	UserHandler       *transport.UserHandler
+func (c *Container) Register(item any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.instances = append(c.instances, item)
+
 }
 
 func NewContainer(ci ContainerItems) *Container {
