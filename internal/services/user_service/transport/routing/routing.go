@@ -1,24 +1,22 @@
 package routing
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"pushpost/internal/di"
-	"pushpost/pkg/middleware"
+	"pushpost/internal/services/user_service/transport"
 )
 
-func SetupRoutes(app *fiber.App, container di.Container) {
-	jwtSecret := "shenanigans"
-	userHandlers := app.Group("/user")
+func SetupRoutes(handler transport.UserHandler) {
+	//jwtSecret := "shenanigans"
+	userHandlers := handler.App().Group("/user")
 
 	// GET  FIXME заменить на Find
-	userHandlers.Get("/getByUuid", container.UserHandler.GetUserByUUID)
-	userHandlers.Get("/getByEmail", container.UserHandler.GetUserByEmail)
-	userHandlers.Get("/getByToken", middleware.AuthJWTMiddleware(jwtSecret), container.UserHandler.GetByToken)
+	userHandlers.Get("/getByUuid", handler.GetUserByUUID)
+	userHandlers.Get("/getByEmail", handler.GetUserByEmail)
+	//userHandlers.Get("/getByToken", middleware.AuthJWTMiddleware(jwtSecret), handler.GetByToken)
 
 	// POST
-	userHandlers.Post("/register", container.UserHandler.RegisterUser)
-	userHandlers.Post("/login", container.UserHandler.Login)
-	userHandlers.Post("/addFriend", container.UserHandler.AddFriend)
+	userHandlers.Post("/register", handler.RegisterUser)
+	userHandlers.Post("/login", handler.Login)
+	//userHandlers.Post("/addFriend", container.UserHandler.AddFriend)
 
 	//DELETE
 	// ... TODO

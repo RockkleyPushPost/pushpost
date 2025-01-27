@@ -21,6 +21,10 @@ type UserUseCase struct {
 	//errChan chan error TODO (try err chan with panic ?)
 }
 
+func NewUserUseCase(userRepo storage.UserRepository) *UserUseCase {
+	return &UserUseCase{UserRepo: userRepo}
+}
+
 func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) error {
 	user, err := entity.NewUser(*dto)
 

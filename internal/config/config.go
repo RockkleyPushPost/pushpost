@@ -1,19 +1,24 @@
 package config
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"errors"
 	"gopkg.in/yaml.v3"
 	"os"
 	"pushpost/pkg/database"
 )
 
 type Config struct {
-	Database database.Config `json:"database" yaml:"database"`
-	Fiber    fiber.Config    `json:"fiber" yaml:"fiber"`
+	Database *database.Config `json:"database" yaml:"database"`
+	Server   *ServerConfig    `json:"fiber" yaml:"fiber"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	var config Config
+type ServerConfig struct {
+	Host string `json:"host" yaml:"host" env:"HOST"`
+	User string `json:"user" yaml:"user" env:"USER"`
+}
+
+func LoadYamlConfig(path string) (*Config, error) {
+	config := Config{}
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -22,8 +27,18 @@ func LoadConfig(path string) (*Config, error) {
 	defer file.Close()
 
 	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(config); err != nil {
+	if err := decoder.Decode(&config); err != nil {
 		return nil, err
 	}
 	return &config, nil
+}
+
+func (c *ServerConfig) Validate() error {
+	if c.Host == "" {
+		return errors.New("missing host")
+	}
+	if c.User == "" {
+		return errors.New("missing user")
+	}
+	return nil
 }

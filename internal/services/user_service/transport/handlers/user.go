@@ -10,6 +10,11 @@ import (
 
 type UserHandler struct {
 	useCase domain.UserUseCase
+	app     *fiber.App
+}
+
+func NewUserHandler(useCase domain.UserUseCase, app *fiber.App) *UserHandler {
+	return &UserHandler{useCase: useCase, app: app}
 }
 
 func RegisterUserHandler(useCase domain.UserUseCase) *UserHandler {
@@ -138,13 +143,16 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 		})
 	}
 
-	err := h.useCase.AddFriend(email)
+	//err := h.useCase.AddFriend(email)
 
-	if err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
+	//if err != nil {
+	//
+	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	//}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship created successfully"})
 
+}
+func (h *UserHandler) App() *fiber.App {
+	return h.app
 }

@@ -5,10 +5,10 @@ import (
 	"errors"
 	"log"
 	"pushpost/internal/config"
-	"pushpost/internal/services/message_service/service/di"
+	"pushpost/internal/services/user_service/service/di"
 )
 
-const servName string = "MessageService"
+const servName string = "UserService"
 
 type Option func(*service)
 
@@ -61,7 +61,7 @@ func (s *service) validate() error {
 func (s *service) Run(ctx context.Context) error {
 	s.logger.Printf("starting %s\n", s.Name())
 
-	err := s.container.Server.Listen(":3001") //fixme gotta parse
+	err := s.container.Server.Listen(":3002") //fixme gotta parse
 	if err != nil {
 		return err
 	}

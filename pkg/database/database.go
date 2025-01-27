@@ -54,6 +54,6 @@ func NewDatabase(config Config) (*gorm.DB, error) {
 
 func getDsnFromConfig(config Config) string {
 
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s search_path=pushpost",
 		config.Host, config.User, config.Password, config.DbName, config.Port)
 }

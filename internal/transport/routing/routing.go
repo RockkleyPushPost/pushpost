@@ -2,7 +2,7 @@ package routing
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"pushpost/internal/di"
+	"pushpost/internal/services/message_service/service/di"
 	"pushpost/pkg/middleware"
 )
 
