@@ -10,5 +10,6 @@ type UserHandler interface {
 	GetByToken(c *fiber.Ctx) error
 	GetFriends(c *fiber.Ctx) error
 	AddFriend(c *fiber.Ctx) error
+	DeleteFriend(c *fiber.Ctx) error
 	App() *fiber.App
 }

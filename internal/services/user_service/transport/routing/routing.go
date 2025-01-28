@@ -22,5 +22,5 @@ func SetupRoutes(handler transport.UserHandler) {
 	userHandlers.Post("/addFriend", middleware.AuthJWTMiddleware(jwtSecret), handler.AddFriend)
 
 	//DELETE
-	// ... TODO
+	userHandlers.Post("/deleteFriend", middleware.AuthJWTMiddleware(jwtSecret), handler.DeleteFriend)
 }

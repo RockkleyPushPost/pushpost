@@ -160,6 +160,26 @@ func (h *UserHandler) GetFriends(c *fiber.Ctx) error {
 
 }
 
+func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
+	var data struct {
+		FriendEmail string `json:"friendEmail"`
+	}
+
+	if err := c.BodyParser(&data); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid request format",
+		})
+	}
+	userUUID := c.Locals("userUUID").(uuid.UUID)
+	err := h.useCase.DeleteFriend(userUUID, data.FriendEmail)
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship destroyed successfully"})
+}
+
 func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 	var friendshipRequest struct {
 		FriendEmail string `json:"friendEmail"`
@@ -171,7 +191,7 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 			"error": "invalid request format",
 		})
 	}
-	fmt.Println("EMAIL", friendshipRequest.FriendEmail)
+
 	userUUID := c.Locals("userUUID").(uuid.UUID)
 	err := h.useCase.AddFriend(userUUID, friendshipRequest.FriendEmail)
 

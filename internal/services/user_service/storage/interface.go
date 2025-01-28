@@ -11,4 +11,5 @@ type UserRepository interface {
 	GetUserByUUID(uuid uuid.UUID) (*entity.User, error)
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
 	AddFriend(userUUID uuid.UUID, friendEmail string) error
+	DeleteFriend(userUUID uuid.UUID, friendEmail string) error
 }

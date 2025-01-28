@@ -98,3 +98,41 @@ func (r *UserRepository) AddFriend(userUUID uuid.UUID, friendEmail string) error
 
 	return r.DB.Create(&friendship).Error
 }
+
+func (r *UserRepository) DeleteFriend(userUUID uuid.UUID, friendEmail string) error {
+
+	user, err := r.GetUserByUUID(userUUID)
+
+	if err != nil {
+		fmt.Println("user not found by UUID")
+		return err
+	}
+	friend, err := r.GetUserByEmail(friendEmail)
+
+	if err != nil {
+
+		return err
+	}
+	fmt.Println("USER ID ", user.ID, " FRIEND ID ", friend.ID)
+	//Check if friendship exists in either direction
+	result := r.DB.Where(
+		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+		user.ID, friend.ID, friend.ID, user.ID,
+	).First(&entity.Friendship{})
+
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		return fmt.Errorf("friendship not exists")
+	}
+
+	//if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	//
+	//	return result.Error
+	//}
+
+	//friendship := entity.Friendship{UserID: user.ID, FriendID: friend.ID}
+
+	return r.DB.Where(
+		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+		user.ID, friend.ID, friend.ID, user.ID).Delete(&entity.Friendship{}).Error
+}
