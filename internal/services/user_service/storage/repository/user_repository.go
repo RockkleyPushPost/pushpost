@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"pushpost/internal/services/user_service/domain/dto"
 	"pushpost/internal/services/user_service/entity"
 )
 
@@ -23,7 +24,7 @@ func (r *UserRepository) RegisterUser(user *entity.User) error {
 
 func (r *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
 	var user entity.User
-	fmt.Println("email", email)
+	fmt.Println("EMAIL", email)
 
 	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
 
@@ -99,15 +100,15 @@ func (r *UserRepository) AddFriend(userUUID uuid.UUID, friendEmail string) error
 	return r.DB.Create(&friendship).Error
 }
 
-func (r *UserRepository) DeleteFriend(userUUID uuid.UUID, friendEmail string) error {
+func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 
-	user, err := r.GetUserByUUID(userUUID)
+	user, err := r.GetUserByUUID(dto.UserUUID)
 
 	if err != nil {
 		fmt.Println("user not found by UUID")
 		return err
 	}
-	friend, err := r.GetUserByEmail(friendEmail)
+	friend, err := r.GetUserByEmail(dto.FriendEmail)
 
 	if err != nil {
 
@@ -131,8 +132,7 @@ func (r *UserRepository) DeleteFriend(userUUID uuid.UUID, friendEmail string) er
 	//}
 
 	//friendship := entity.Friendship{UserID: user.ID, FriendID: friend.ID}
-
-	return r.DB.Where(
+	return r.DB.Unscoped().Where(
 		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
 		user.ID, friend.ID, friend.ID, user.ID).Delete(&entity.Friendship{}).Error
 }

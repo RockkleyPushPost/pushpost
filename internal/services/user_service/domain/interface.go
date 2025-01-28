@@ -13,6 +13,6 @@ type UserUseCase interface {
 	GetByEmail(email string) (*entity.User, error)
 	AddFriend(userUUID uuid.UUID, email string) error
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
-	DeleteFriend(userUUID uuid.UUID, email string) error
+	DeleteFriend(dto *dto.DeleteFriendDTO) error
 	//GetByToken()
 }

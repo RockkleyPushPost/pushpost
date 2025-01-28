@@ -97,6 +97,6 @@ func (u *UserUseCase) GetFriends(userUUID uuid.UUID) ([]entity.User, error) {
 	return u.UserRepo.GetFriends(userUUID)
 }
 
-func (u *UserUseCase) DeleteFriend(userUUID uuid.UUID, email string) error {
-	return u.UserRepo.DeleteFriend(userUUID, email)
+func (u *UserUseCase) DeleteFriend(dto *dto.DeleteFriendDTO) error {
+	return u.UserRepo.DeleteFriend(dto)
 }

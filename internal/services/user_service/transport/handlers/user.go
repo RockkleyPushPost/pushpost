@@ -172,9 +172,11 @@ func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
 		})
 	}
 	userUUID := c.Locals("userUUID").(uuid.UUID)
-	err := h.useCase.DeleteFriend(userUUID, data.FriendEmail)
-	if err != nil {
 
+	dto := dto.DeleteFriendDTO{UserUUID: userUUID, FriendEmail: data.FriendEmail}
+	err := h.useCase.DeleteFriend(&dto)
+
+	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship destroyed successfully"})

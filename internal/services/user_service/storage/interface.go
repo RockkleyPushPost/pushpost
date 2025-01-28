@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/google/uuid"
+	"pushpost/internal/services/user_service/domain/dto"
 	"pushpost/internal/services/user_service/entity"
 )
 
@@ -11,5 +12,5 @@ type UserRepository interface {
 	GetUserByUUID(uuid uuid.UUID) (*entity.User, error)
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
 	AddFriend(userUUID uuid.UUID, friendEmail string) error
-	DeleteFriend(userUUID uuid.UUID, friendEmail string) error
+	DeleteFriend(dto *dto.DeleteFriendDTO) error
 }
