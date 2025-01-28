@@ -25,7 +25,7 @@ func AuthJWTMiddleware(secret string) fiber.Handler {
 		token := parts[1]
 		claims, err := jwt.VerifyToken(token, secret)
 		if err != nil {
-			//log.Printf("Token verification failed: %v", err)
+			log.Printf("Token verification failed: %v", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid or expired token",
 			})

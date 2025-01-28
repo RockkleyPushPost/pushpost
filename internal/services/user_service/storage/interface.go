@@ -9,4 +9,6 @@ type UserRepository interface {
 	RegisterUser(user *entity.User) error
 	GetUserByEmail(email string) (*entity.User, error)
 	GetUserByUUID(uuid uuid.UUID) (*entity.User, error)
+	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
+	AddFriend(userUUID uuid.UUID, friendEmail string) error
 }

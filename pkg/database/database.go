@@ -13,6 +13,7 @@ type Config struct {
 	Password string `json:"password" yaml:"password" env:"PASSWORD"`
 	DbName   string `json:"db_name" yaml:"db_name" env:"DB_NAME"`
 	Port     string `json:"port" yaml:"port" env:"PORT"`
+	Schema   string `json:"schema" yaml:"schema" env:"SCHEMA"`
 }
 
 func (c *Config) Validate() error {
@@ -54,6 +55,6 @@ func NewDatabase(config Config) (*gorm.DB, error) {
 
 func getDsnFromConfig(config Config) string {
 
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s search_path=pushpost",
-		config.Host, config.User, config.Password, config.DbName, config.Port)
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s search_path=%s",
+		config.Host, config.User, config.Password, config.DbName, config.Port, config.Schema)
 }

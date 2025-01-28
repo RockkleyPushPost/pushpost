@@ -4,6 +4,7 @@ import (
 	"pushpost/internal/config"
 	"pushpost/internal/services/user_service/domain"
 	"pushpost/internal/services/user_service/domain/usecase"
+	"pushpost/internal/services/user_service/entity"
 	"pushpost/internal/services/user_service/storage"
 	"pushpost/internal/services/user_service/storage/repository"
 	"pushpost/internal/services/user_service/transport"
@@ -13,16 +14,18 @@ import (
 )
 
 func Setup(cfg config.Config, di *Container) error {
+
+	jwtSecret := "bullsonparade"
 	db, err := setup.Database(cfg.Database)
 	di.DB = db
 	if err != nil {
 		return err
 	}
-
+	db.AutoMigrate(entity.User{})
 	fiber := setup.NewFiber()
 	di.Server = fiber
 	var userRepository storage.UserRepository = repository.NewUserRepository(db)
-	var userUseCase domain.UserUseCase = usecase.NewUserUseCase(userRepository)
+	var userUseCase domain.UserUseCase = usecase.NewUserUseCase(userRepository, jwtSecret)
 	var userHandler transport.UserHandler = transport2.NewUserHandler(userUseCase, fiber)
 
 	routing.SetupRoutes(userHandler)

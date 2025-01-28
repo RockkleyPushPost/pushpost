@@ -7,5 +7,8 @@ type UserHandler interface {
 	GetUserByEmail(c *fiber.Ctx) error
 	RegisterUser(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
+	GetByToken(c *fiber.Ctx) error
+	GetFriends(c *fiber.Ctx) error
+	AddFriend(c *fiber.Ctx) error
 	App() *fiber.App
 }

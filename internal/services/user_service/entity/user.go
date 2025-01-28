@@ -11,8 +11,8 @@ import (
 type User struct {
 	gorm.Model
 	UUID              uuid.UUID
-	Name              string
-	Email             string `gorm:"unique"`
+	Name              string `json:"name"`
+	Email             string `json:"email" gorm:"unique"`
 	Password          string
 	Age               uint
 	LastTimeActivity  time.Time

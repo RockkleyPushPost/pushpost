@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"pushpost/internal/services/user_service/domain"
@@ -106,6 +107,7 @@ func (h *UserHandler) GetByToken(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) Login(c *fiber.Ctx) error {
+
 	var loginRequest dto.UserLoginDTO
 
 	if err := c.BodyParser(&loginRequest); err != nil {
@@ -130,10 +132,37 @@ func (h *UserHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
+func (h *UserHandler) GetFriends(c *fiber.Ctx) error {
+	//var userUUID struct {
+	//	Uuid string `json:"uuid"`
+	//}
+	//
+	//if err := c.BodyParser(&userUUID); err != nil {
+	//
+	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	//		"error": "invalid request format",
+	//	})
+	//}
+	//token := strings.Split(c.GetReqHeaders()["Authorization"][0], " ")[1]
+	//fmt.Println(token)
+	//userUuid, err := jwt.VerifyToken(token, "shenanigans")
+	//fmt.Println(userUuid)
+	//os.Exit(1)
+	userUUID := c.Locals("userUUID").(uuid.UUID)
+	friends, err := h.useCase.GetFriends(userUUID)
+	fmt.Println(friends)
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(friends)
+
+}
+
 func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 	var friendshipRequest struct {
-		userUUID    uuid.UUID
-		friendEmail string
+		FriendEmail string `json:"friendEmail"`
 	}
 
 	if err := c.BodyParser(&friendshipRequest); err != nil {
@@ -142,13 +171,14 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 			"error": "invalid request format",
 		})
 	}
+	fmt.Println("EMAIL", friendshipRequest.FriendEmail)
+	userUUID := c.Locals("userUUID").(uuid.UUID)
+	err := h.useCase.AddFriend(userUUID, friendshipRequest.FriendEmail)
 
-	//err := h.useCase.AddFriend(email)
+	if err != nil {
 
-	//if err != nil {
-	//
-	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	//}
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship created successfully"})
 

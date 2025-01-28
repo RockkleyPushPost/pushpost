@@ -11,4 +11,7 @@ type UserUseCase interface {
 	Login(dto dto.UserLoginDTO) (string, error)
 	GetByUUID(uuid uuid.UUID) (*entity.User, error)
 	GetByEmail(email string) (*entity.User, error)
+	AddFriend(userUUID uuid.UUID, email string) error
+	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
+	//GetByToken()
 }

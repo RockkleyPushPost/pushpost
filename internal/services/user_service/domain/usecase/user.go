@@ -21,8 +21,8 @@ type UserUseCase struct {
 	//errChan chan error TODO (try err chan with panic ?)
 }
 
-func NewUserUseCase(userRepo storage.UserRepository) *UserUseCase {
-	return &UserUseCase{UserRepo: userRepo}
+func NewUserUseCase(userRepo storage.UserRepository, jwtSecret string) *UserUseCase {
+	return &UserUseCase{UserRepo: userRepo, JwtSecret: jwtSecret}
 }
 
 func (u *UserUseCase) RegisterUser(dto *dto.RegisterUserDTO) error {
@@ -89,6 +89,10 @@ func (u *UserUseCase) sendVerificationEmail(email string, verificationToken stri
 	// TODO
 }
 
-//func (u *UserUseCase) AddFriend(userUUID uuid.UUID, email string) error {
-//return u.UserRepo.AddFriend(userUUID, email)
-//}
+func (u *UserUseCase) AddFriend(userUUID uuid.UUID, email string) error {
+	return u.UserRepo.AddFriend(userUUID, email)
+}
+
+func (u *UserUseCase) GetFriends(userUUID uuid.UUID) ([]entity.User, error) {
+	return u.UserRepo.GetFriends(userUUID)
+}

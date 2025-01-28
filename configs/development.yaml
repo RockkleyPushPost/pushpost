@@ -4,6 +4,7 @@ database:
   user: "postgres"
   password: "pushword"
   db_name: "pushpost"
+  schema: "pushpost"
 
 server:
   address: "localhost"
