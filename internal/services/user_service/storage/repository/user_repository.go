@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"log"
 	"pushpost/internal/services/user_service/domain/dto"
 	"pushpost/internal/services/user_service/entity"
 )
 
 type UserRepository struct {
-	DB *gorm.DB
+	DB *gorm.DB `bind:"*gorm.DB"`
 }
 
 func NewUserRepository(DB *gorm.DB) *UserRepository {
@@ -24,8 +25,7 @@ func (r *UserRepository) RegisterUser(user *entity.User) error {
 
 func (r *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
 	var user entity.User
-	fmt.Println("EMAIL", email)
-
+	fmt.Println(r.DB)
 	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
 
 		return nil, err
@@ -70,7 +70,7 @@ func (r *UserRepository) AddFriend(userUUID uuid.UUID, friendEmail string) error
 	user, err := r.GetUserByUUID(userUUID)
 
 	if err != nil {
-		fmt.Println("user not found by UUID")
+		log.Println("user not found by UUID")
 		return err
 	}
 	friend, err := r.GetUserByEmail(friendEmail)
@@ -105,7 +105,7 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 	user, err := r.GetUserByUUID(dto.UserUUID)
 
 	if err != nil {
-		fmt.Println("user not found by UUID")
+		log.Println("user not found by UUID")
 		return err
 	}
 	friend, err := r.GetUserByEmail(dto.FriendEmail)
@@ -114,7 +114,6 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 
 		return err
 	}
-	fmt.Println("USER ID ", user.ID, " FRIEND ID ", friend.ID)
 	//Check if friendship exists in either direction
 	result := r.DB.Where(
 		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
@@ -122,7 +121,7 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 	).First(&entity.Friendship{})
 
 	if result.Error != nil {
-		fmt.Println(result.Error)
+
 		return fmt.Errorf("friendship not exists")
 	}
 

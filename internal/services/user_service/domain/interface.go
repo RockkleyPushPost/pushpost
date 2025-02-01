@@ -16,3 +16,10 @@ type UserUseCase interface {
 	DeleteFriend(dto *dto.DeleteFriendDTO) error
 	//GetByToken()
 }
+
+type FriendshipUseCase interface {
+	CreateFriendshipRequest(dto dto.CreateFriendRequestDto) error
+	GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
+	UpdateFriendshipRequestStatus(dto.UpdateFriendshipRequestDto) error
+	DeleteFriendshipRequest(requestID uuid.UUID) error
+}

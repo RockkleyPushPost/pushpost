@@ -1,4 +1,4 @@
 dbconn?="localhost:5432"
 
 migration:
-	goose -dir internal/services/message_service/storage/migrations create create_message_table sql
+	goose -dir internal/services/user_service/storage/migrations create create_friend_requests_table sql

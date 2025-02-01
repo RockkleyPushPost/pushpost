@@ -14,3 +14,10 @@ type UserRepository interface {
 	AddFriend(userUUID uuid.UUID, friendEmail string) error
 	DeleteFriend(dto *dto.DeleteFriendDTO) error
 }
+
+type FriendRequestRepository interface {
+	CreateFriendshipRequest(request entity.FriendshipRequest) error
+	GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
+	UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error
+	DeleteFriendshipRequest(requestID uuid.UUID) error
+}

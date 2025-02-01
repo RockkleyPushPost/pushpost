@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"pushpost/internal/config"
 	"pushpost/internal/services/user_service/service"
-	"pushpost/internal/services/user_service/service/di"
 	"syscall"
 )
 
@@ -23,20 +22,15 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	container, err := di.NewContainer()
+	err = service.Setup(cfg)
 
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	err = di.Setup(*cfg, container)
-
-	if err != nil {
-		logger.Fatal(err)
-	}
 	srv, err := service.NewService(
 		service.WithConfig(cfg),
-		service.WithContainer(container),
+		//service.WithContainer(container),
 		service.WithLogger(logger),
 	)
 	if err != nil {

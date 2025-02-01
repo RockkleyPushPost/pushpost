@@ -16,7 +16,7 @@ import (
 var _ domain.UserUseCase = &UserUseCase{}
 
 type UserUseCase struct {
-	UserRepo  storage.UserRepository
+	UserRepo  storage.UserRepository `bind:"*repository.UserRepository"`
 	JwtSecret string
 	//errChan chan error TODO (try err chan with panic ?)
 }
@@ -52,6 +52,12 @@ func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 		return "", err
 	}
 
+	if u.UserRepo == nil {
+		return "", fmt.Errorf("UserRepo is not initialized")
+	}
+	if u.JwtSecret == "" {
+		return "", fmt.Errorf("JwtSecret is not set")
+	}
 	user, err := u.UserRepo.GetUserByEmail(dto.Email)
 
 	if err != nil {
@@ -71,7 +77,7 @@ func (u *UserUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 
 		return "", err
 	}
-	//fmt.Printf("User %s logged in, password %s", user.Email, user.Password)
+
 	return token, nil
 }
 
@@ -90,13 +96,16 @@ func (u *UserUseCase) sendVerificationEmail(email string, verificationToken stri
 }
 
 func (u *UserUseCase) AddFriend(userUUID uuid.UUID, email string) error {
+
 	return u.UserRepo.AddFriend(userUUID, email)
 }
 
 func (u *UserUseCase) GetFriends(userUUID uuid.UUID) ([]entity.User, error) {
+
 	return u.UserRepo.GetFriends(userUUID)
 }
 
 func (u *UserUseCase) DeleteFriend(dto *dto.DeleteFriendDTO) error {
+
 	return u.UserRepo.DeleteFriend(dto)
 }

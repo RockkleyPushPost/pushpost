@@ -11,5 +11,15 @@ type UserHandler interface {
 	GetFriends(c *fiber.Ctx) error
 	AddFriend(c *fiber.Ctx) error
 	DeleteFriend(c *fiber.Ctx) error
-	App() *fiber.App
+}
+
+type FriendshipHandler interface {
+	CreateFriendshipRequest(c *fiber.Ctx) error
+	GetFriendshipRequestsByRecipientUUID(c *fiber.Ctx) error
+	UpdateFriendshipRequestStatus(c *fiber.Ctx) error
+	DeleteFriendshipRequest(c *fiber.Ctx) error
+}
+
+type Handler interface {
+	Handler()
 }

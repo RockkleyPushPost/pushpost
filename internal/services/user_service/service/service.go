@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"pushpost/internal/config"
-	"pushpost/internal/services/user_service/service/di"
 )
 
 const servName string = "UserService"
@@ -13,9 +12,9 @@ const servName string = "UserService"
 type Option func(*service)
 
 type service struct {
-	container *di.Container
-	logger    *log.Logger
-	config    *config.Config
+	//container *di.Container
+	logger *log.Logger
+	config *config.Config
 }
 
 func NewService(opts ...Option) (Service, error) {
@@ -27,11 +26,11 @@ func NewService(opts ...Option) (Service, error) {
 	return s, s.validate()
 }
 
-func WithContainer(container *di.Container) Option {
-	return func(s *service) {
-		s.container = container
-	}
-}
+//func WithContainer(container *di.Container) Option {
+//	return func(s *service) {
+//		s.container = container
+//	}
+//}
 
 func WithLogger(logger *log.Logger) Option {
 	return func(s *service) {
@@ -47,9 +46,9 @@ func WithConfig(config *config.Config) Option {
 
 func (s *service) validate() error {
 
-	if s.container == nil {
-		return errors.New("missing container")
-	}
+	//if s.container == nil {
+	//	return errors.New("missing container")
+	//}
 	if s.logger == nil {
 		return errors.New("missing logger")
 	}
@@ -61,21 +60,21 @@ func (s *service) validate() error {
 func (s *service) Run(ctx context.Context) error {
 	s.logger.Printf("starting %s\n", s.Name())
 
-	err := s.container.Server.Listen(":3004") //fixme gotta parse
-	if err != nil {
-		return err
-	}
+	//err := s.container.Server.Listen(":3004") //fixme gotta parse
+	//if err != nil {
+	//	return err
+	//}
 	<-ctx.Done()
 	return nil
 }
 
 func (s *service) Shutdown(ctx context.Context) error {
-	s.logger.Printf("shutting down %s...\n", servName)
-	err := s.container.Server.Shutdown()
-	if err != nil {
-		return err
-	}
-	ctx.Done()
+	//s.logger.Printf("shutting down %s...\n", servName)
+	//err := s.container.Server.Shutdown()
+	//if err != nil {
+	//	return err
+	//}
+	//ctx.Done()
 	return nil
 }
 

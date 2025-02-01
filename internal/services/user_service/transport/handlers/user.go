@@ -1,7 +1,6 @@
 package transport
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"pushpost/internal/services/user_service/domain"
@@ -10,17 +9,11 @@ import (
 )
 
 type UserHandler struct {
-	useCase domain.UserUseCase
-	app     *fiber.App
+	UserUseCase domain.UserUseCase `bind:"*usecase.UserUseCase"`
 }
 
-func NewUserHandler(useCase domain.UserUseCase, app *fiber.App) *UserHandler {
-	return &UserHandler{useCase: useCase, app: app}
-}
-
-func RegisterUserHandler(useCase domain.UserUseCase) *UserHandler {
-
-	return &UserHandler{useCase: useCase}
+func NewUserHandler(useCase domain.UserUseCase) *UserHandler {
+	return &UserHandler{UserUseCase: useCase}
 }
 
 func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
@@ -43,7 +36,7 @@ func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	err := h.useCase.RegisterUser(&params)
+	err := h.UserUseCase.RegisterUser(&params)
 
 	if err != nil {
 
@@ -61,7 +54,7 @@ func (h *UserHandler) GetUserByUUID(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	user, err := h.useCase.GetByUUID(body.UUID)
+	user, err := h.UserUseCase.GetByUUID(body.UUID)
 
 	if err != nil {
 
@@ -79,7 +72,7 @@ func (h *UserHandler) GetUserByEmail(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	user, err := h.useCase.GetByEmail(body.Email)
+	user, err := h.UserUseCase.GetByEmail(body.Email)
 
 	if err != nil {
 
@@ -92,7 +85,7 @@ func (h *UserHandler) GetUserByEmail(c *fiber.Ctx) error {
 func (h *UserHandler) GetByToken(c *fiber.Ctx) error {
 	userUUID := c.Locals("userUUID").(uuid.UUID)
 
-	user, err := h.useCase.GetByUUID(userUUID)
+	user, err := h.UserUseCase.GetByUUID(userUUID)
 
 	if err != nil {
 
@@ -113,11 +106,11 @@ func (h *UserHandler) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&loginRequest); err != nil {
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request format",
+			"error": "invalid request format:" + err.Error(),
 		})
 	}
 
-	token, err := h.useCase.Login(loginRequest)
+	token, err := h.UserUseCase.Login(loginRequest)
 
 	if err != nil {
 
@@ -149,8 +142,8 @@ func (h *UserHandler) GetFriends(c *fiber.Ctx) error {
 	//fmt.Println(userUuid)
 	//os.Exit(1)
 	userUUID := c.Locals("userUUID").(uuid.UUID)
-	friends, err := h.useCase.GetFriends(userUUID)
-	fmt.Println(friends)
+	friends, err := h.UserUseCase.GetFriends(userUUID)
+
 	if err != nil {
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
@@ -173,13 +166,15 @@ func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
 	}
 	userUUID := c.Locals("userUUID").(uuid.UUID)
 
-	dto := dto.DeleteFriendDTO{UserUUID: userUUID, FriendEmail: data.FriendEmail}
-	err := h.useCase.DeleteFriend(&dto)
+	prop := dto.DeleteFriendDTO{UserUUID: userUUID, FriendEmail: data.FriendEmail}
+	err := h.UserUseCase.DeleteFriend(&prop)
 
 	if err != nil {
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship destroyed successfully"})
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Friendship destroyed successfully"})
 }
 
 func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
@@ -195,7 +190,7 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 	}
 
 	userUUID := c.Locals("userUUID").(uuid.UUID)
-	err := h.useCase.AddFriend(userUUID, friendshipRequest.FriendEmail)
+	err := h.UserUseCase.AddFriend(userUUID, friendshipRequest.FriendEmail)
 
 	if err != nil {
 
@@ -205,6 +200,5 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship created successfully"})
 
 }
-func (h *UserHandler) App() *fiber.App {
-	return h.app
-}
+
+func (h *UserHandler) Handler() {}
