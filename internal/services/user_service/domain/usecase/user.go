@@ -16,7 +16,7 @@ import (
 var _ domain.UserUseCase = &UserUseCase{}
 
 type UserUseCase struct {
-	UserRepo  storage.UserRepository `bind:"*repository.UserRepository"`
+	UserRepo  storage.UserRepository `bind:"storage.UserRepository"`
 	JwtSecret string
 	//errChan chan error TODO (try err chan with panic ?)
 }

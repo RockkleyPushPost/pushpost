@@ -2,13 +2,16 @@ package di
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"log"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 type DI struct {
+	sync.RWMutex
 	dependencies map[reflect.Type]interface{}
 	app          *fiber.App
 }
@@ -20,44 +23,62 @@ func NewDI(app *fiber.App) *DI {
 	}
 }
 
-func (di *DI) Register(dependency interface{}) {
-	di.dependencies[reflect.TypeOf(dependency)] = dependency
-	t := reflect.TypeOf(dependency)
-	di.dependencies[t] = dependency
-	log.Printf("Registered dependency type: %v", t)
-
+func (di *DI) Register(dependencies ...interface{}) error {
+	di.Lock()
+	defer di.Unlock()
+	for _, dependency := range dependencies {
+		if dependency == nil {
+			return errors.New("cannot register nil dependency")
+		}
+		t := reflect.TypeOf(dependency)
+		di.dependencies[t] = dependency
+		log.Printf("Registered dependency type: %v", t)
+	}
+	return nil
 }
 
-func (di *DI) Bind(target interface{}) error {
-	val := reflect.ValueOf(target).Elem()
-	typ := val.Type()
-
-	log.Printf("Binding target type: %T", target)
-	for k := range di.dependencies {
-		log.Printf("Available dependency: %v", k)
-	}
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		fieldType := typ.Field(i)
-		if tag, ok := fieldType.Tag.Lookup("bind"); ok {
-			// Look for exact type match first
-			log.Printf("Looking to bind field type: %v with tag: %v", field.Type(), tag)
-
-			if dep, exists := di.dependencies[field.Type()]; exists {
-				field.Set(reflect.ValueOf(dep))
-				continue
-			}
-
-			// If not found, try to find by tag
-			for depType, dep := range di.dependencies {
-				if depType.String() == tag {
-					field.Set(reflect.ValueOf(dep))
-					break
-				}
-			}
+func (di *DI) Bind(targets ...interface{}) error {
+	for _, target := range targets {
+		if err := di.bindTarget(target); err != nil {
+			return err
 		}
 	}
 	return nil
+}
+
+func (di *DI) bindTarget(target interface{}) error {
+	val := reflect.ValueOf(target).Elem()
+	typ := val.Type()
+
+	for i := 0; i < val.NumField(); i++ {
+		if err := di.bindField(val.Field(i), typ.Field(i)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (di *DI) bindField(field reflect.Value, fieldType reflect.StructField) error {
+	tag, ok := fieldType.Tag.Lookup("bind")
+	if !ok {
+		return nil
+	}
+
+	if dep, exists := di.dependencies[field.Type()]; exists {
+		field.Set(reflect.ValueOf(dep))
+		log.Printf("Bound dependency using tag: %s", tag)
+		return nil
+	}
+
+	for depType, dep := range di.dependencies {
+		if field.Type().Kind() == reflect.Interface && depType.Implements(field.Type()) {
+			field.Set(reflect.ValueOf(dep))
+			log.Printf("Bound interface dependency using tag: %s", tag)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("dependency not found for field %s with tag %s", fieldType.Name, tag)
 }
 
 func (di *DI) RegisterRoutes(routes interface{}, pathPrefix string) error {

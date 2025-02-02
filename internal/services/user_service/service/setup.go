@@ -15,31 +15,24 @@ import (
 )
 
 func Setup(cfg *config.Config) error {
-
 	jwtSecret := "bullsonparade"
 
 	app := setup.NewFiber()
 	DI := di.NewDI(app)
-
-	DI.Register(app)
-
 	db, err := setup.Database(cfg.Database)
-
-	DI.Register(db)
-	DI.Bind(db)
-
-	//r := router.NewRouter(app)
+	if err != nil {
+		return err
+	}
 
 	// User
 	var userRepository storage.UserRepository = &repository.UserRepository{}
-	DI.Bind(userRepository)
-	DI.Register(userRepository)
 	var userUseCase domain.UserUseCase = &usecase.UserUseCase{JwtSecret: jwtSecret}
-	log.Printf("Registering usecase type: %T", userUseCase)
-	DI.Bind(userUseCase)
-	DI.Register(userUseCase)
 	var userHandler transport2.UserHandler = &transport.UserHandler{}
-	if err = DI.Bind(userHandler); err != nil {
+
+	if err := DI.Register(app, db, userRepository, userUseCase, userHandler, userHandler); err != nil {
+		log.Fatalf("failed to register %v", err)
+	}
+	if err := DI.Bind(app, db, userRepository, userUseCase, userHandler, userHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
 	}
 
@@ -58,12 +51,16 @@ func Setup(cfg *config.Config) error {
 
 	// Friendship
 	var friendshipRepository storage.FriendRequestRepository = &repository.FriendshipRequestRepository{}
-	DI.Register(friendshipRepository)
 	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{}
-	DI.Register(friendshipUseCase)
 	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
-
-	//user
+	err = DI.Register(friendshipRepository)
+	if err != nil {
+		return err
+	}
+	err = DI.Register(friendshipUseCase)
+	if err != nil {
+		return err
+	}
 
 	if err = DI.Bind(friendshipHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
@@ -75,41 +72,3 @@ func Setup(cfg *config.Config) error {
 	}
 	return nil
 }
-
-//
-//func Setup(cfg config.Config, di *di.Container) error {
-//	db, err := setup.Database(&cfg.Database)
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	di.Register(db)
-//
-//	fiber := setup.NewFiber(&cfg.Fiber)
-//
-//	di.Register(fiber)
-//
-//	// Domain
-//
-//	// Domain - UseCases
-//
-//	varuserUseCase domain.MessageUseCase = &usecase.MessageUseCase{}
-//	di.Register(userUseCase)
-//
-//	// Storage
-//
-//	// Storage - Repositories
-//
-//	varuserRepository storage.MessageRepository = &repository.MessageRepository{}
-//	di.Register(userRepository)
-//
-//	// Routing
-//
-//	varuserHandler transport.MessageHandler = &transport2.MessagesHandler{}
-//
-//	routing.SetupRoutes(userHandler)
-//	di.Register(userHandler)
-//
-//	return nil
-//}
