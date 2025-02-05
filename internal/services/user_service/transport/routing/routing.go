@@ -13,26 +13,9 @@ type UserRoutes struct {
 	DeleteFriend  fiber.Handler `method:"DELETE"`
 }
 
-//func SetupRoutes(router *fiber.App) {
-//	jwtSecret := "bullsonparade"
-//
-//	userHandlers := router.Group("/user")
-//	friendshipHandlers := router.Group("/friendship")
-//
-//	// USER HANDLERS
-//
-//	// GET  FIXME заменить на Find
-//	//userHandlers.Get("/getByUuid", router.GetUserByUUID)
-//	//userHandlers.Get("/getByEmail", router.GetUserByEmail)
-//	//userHandlers.Get("/getFriends", middleware.AuthJWTMiddleware(jwtSecret), router.GetFriends)
-//	//
-//	//userHandlers.Get("/getByToken", middleware.AuthJWTMiddleware(jwtSecret), router.GetByToken)
-//	//
-//	//POST
-//	//userHandlers.Post("/register", router.RegisterUser)
-//	//userHandlers.Post("/login", router.Login)
-//	//userHandlers.Post("/addFriend", middleware.AuthJWTMiddleware(jwtSecret), router.AddFriend)
-//
-//	//DELETE
-//	userHandlers.Post("/deleteFriend", middleware.AuthJWTMiddleware(jwtSecret), router.DeleteFriend)
-//}
+type FriendshipRoutes struct {
+	CreateFriendshipRequest              fiber.Handler `method:"POST"`
+	GetFriendshipRequestsByRecipientUUID fiber.Handler `method:"GET"`
+	UpdateFriendshipRequestStatus        fiber.Handler `method:"POST"`
+	DeleteFriendshipRequest              fiber.Handler `method:"DELETE"`
+}

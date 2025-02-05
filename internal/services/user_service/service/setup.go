@@ -18,21 +18,30 @@ func Setup(cfg *config.Config) error {
 	jwtSecret := "bullsonparade"
 
 	app := setup.NewFiber()
-	DI := di.NewDI(app)
 	db, err := setup.Database(cfg.Database)
 	if err != nil {
 		return err
 	}
+	DI := di.NewDI(app)
 
 	// User
 	var userRepository storage.UserRepository = &repository.UserRepository{}
 	var userUseCase domain.UserUseCase = &usecase.UserUseCase{JwtSecret: jwtSecret}
 	var userHandler transport2.UserHandler = &transport.UserHandler{}
 
-	if err := DI.Register(app, db, userRepository, userUseCase, userHandler, userHandler); err != nil {
+	// Friendship
+	var friendshipRepository storage.FriendRequestRepository = &repository.FriendshipRequestRepository{}
+	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{}
+	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
+
+	if err := DI.Register(
+		app, db, userRepository, userUseCase, userHandler, userHandler,
+		friendshipRepository, friendshipUseCase, friendshipHandler); err != nil {
 		log.Fatalf("failed to register %v", err)
 	}
-	if err := DI.Bind(app, db, userRepository, userUseCase, userHandler, userHandler); err != nil {
+
+	if err := DI.Bind(app, db, userRepository, userUseCase, userHandler, userHandler,
+		friendshipRepository, friendshipUseCase, friendshipHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
 	}
 
@@ -45,25 +54,18 @@ func Setup(cfg *config.Config) error {
 		DeleteFriend:  userHandler.DeleteFriend,
 	}
 
+	friendshipRoutes := routing.FriendshipRoutes{
+		CreateFriendshipRequest:              friendshipHandler.CreateFriendshipRequest,
+		GetFriendshipRequestsByRecipientUUID: friendshipHandler.GetFriendshipRequestsByRecipientUUID,
+		UpdateFriendshipRequestStatus:        friendshipHandler.UpdateFriendshipRequestStatus,
+		DeleteFriendshipRequest:              friendshipHandler.DeleteFriendshipRequest,
+	}
+
 	if err := DI.RegisterRoutes(userRoutes, "/user"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
 	}
-
-	// Friendship
-	var friendshipRepository storage.FriendRequestRepository = &repository.FriendshipRequestRepository{}
-	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{}
-	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
-	err = DI.Register(friendshipRepository)
-	if err != nil {
-		return err
-	}
-	err = DI.Register(friendshipUseCase)
-	if err != nil {
-		return err
-	}
-
-	if err = DI.Bind(friendshipHandler); err != nil {
-		log.Fatalf("failed to bind %v", err)
+	if err := DI.RegisterRoutes(friendshipRoutes, "/friendship"); err != nil {
+		log.Fatalf("failed to register routes: %v", err)
 	}
 
 	log.Println("Server started on :8080")

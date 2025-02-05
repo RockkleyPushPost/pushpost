@@ -26,8 +26,16 @@ func (r *FriendshipRequestRepository) GetFriendshipRequestsByRecipientUUID(recip
 }
 
 func (r *FriendshipRequestRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error {
-	//TODO implement me
-	panic("implement me")
+	var request entity.FriendshipRequest
+
+	if err := r.DB.Where("uuid = ?", dto.RequestUUID).First(&request).Error; err != nil {
+
+		return err
+	}
+	request.Status = dto.Status
+
+	return r.DB.Save(&request).Error
+
 }
 
 func (r *FriendshipRequestRepository) DeleteFriendshipRequest(requestID uuid.UUID) error {

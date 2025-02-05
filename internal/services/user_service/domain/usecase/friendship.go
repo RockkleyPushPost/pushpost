@@ -8,6 +8,14 @@ import (
 	"pushpost/internal/services/user_service/storage"
 )
 
+//type FriendRequestStatus string
+//
+//const (
+//	StatusPending  FriendRequestStatus = "pending"
+//	StatusAccepted FriendRequestStatus = "accepted"
+//	StatusRejected FriendRequestStatus = "rejected"
+//)
+
 // implementation check
 var _ domain.FriendshipUseCase = &FriendshipUseCase{}
 
@@ -32,11 +40,12 @@ func (uc *FriendshipUseCase) GetFriendshipRequestsByRecipientUUID(recipientUUID 
 }
 
 func (uc *FriendshipUseCase) UpdateFriendshipRequestStatus(requestDto dto.UpdateFriendshipRequestDto) error {
-	//TODO implement me
-	panic("implement me")
+
+	return uc.FriendshipRequestRepo.UpdateFriendshipRequestStatus(requestDto)
+
 }
 
-func (uc *FriendshipUseCase) DeleteFriendshipRequest(requestID uuid.UUID) error {
+func (uc *FriendshipUseCase) DeleteFriendshipRequest(dto.DeleteFriendshipRequestDto) error {
 	//TODO implement me
 	panic("implement me")
 }

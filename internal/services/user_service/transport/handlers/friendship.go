@@ -50,12 +50,52 @@ func (h *FriendshipHandler) GetFriendshipRequestsByRecipientUUID(c *fiber.Ctx) e
 }
 
 func (h *FriendshipHandler) UpdateFriendshipRequestStatus(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
+	// todo test it
+	var dto dto2.UpdateFriendshipRequestDto
+
+	if err := c.BodyParser(&dto); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := dto.Validate(); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	err := h.UseCase.UpdateFriendshipRequestStatus(dto)
+
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "friendship status updated successfully"})
+
 }
 
 func (h *FriendshipHandler) DeleteFriendshipRequest(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
+	var dto dto2.DeleteFriendshipRequestDto
+
+	if err := c.BodyParser(&dto); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := dto.Validate(); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	err := h.UseCase.DeleteFriendshipRequest(dto)
+
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "friendship status updated successfully"})
+
 }
+
 func (h *FriendshipHandler) Handler() {}

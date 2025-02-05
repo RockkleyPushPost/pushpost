@@ -14,12 +14,11 @@ type UserUseCase interface {
 	AddFriend(userUUID uuid.UUID, email string) error
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
 	DeleteFriend(dto *dto.DeleteFriendDTO) error
-	//GetByToken()
 }
 
 type FriendshipUseCase interface {
 	CreateFriendshipRequest(dto dto.CreateFriendRequestDto) error
 	GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
 	UpdateFriendshipRequestStatus(dto.UpdateFriendshipRequestDto) error
-	DeleteFriendshipRequest(requestID uuid.UUID) error
+	DeleteFriendshipRequest(dto.DeleteFriendshipRequestDto) error
 }
