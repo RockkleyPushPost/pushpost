@@ -10,5 +10,6 @@ STAGE: early development
 * Postgresql
 * Docker
 * Goose
+* Redis
 
   
