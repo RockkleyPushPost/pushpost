@@ -8,7 +8,7 @@ import (
 )
 
 type FriendshipRequestRepository struct {
-	DB *gorm.DB
+	DB *gorm.DB `bind:"*gorm.DB"`
 }
 
 func NewFriendshipRequestRepository(DB *gorm.DB) *FriendshipRequestRepository {
@@ -26,16 +26,19 @@ func (r *FriendshipRequestRepository) GetFriendshipRequestsByRecipientUUID(recip
 }
 
 func (r *FriendshipRequestRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error {
-	var request entity.FriendshipRequest
+	result := r.DB.Model(&entity.FriendshipRequest{}).
+		Where("uuid = ?", dto.RequestUUID).
+		Update("status", dto.Status)
 
-	if err := r.DB.Where("uuid = ?", dto.RequestUUID).First(&request).Error; err != nil {
-
-		return err
+	if result.Error != nil {
+		return result.Error
 	}
-	request.Status = dto.Status
 
-	return r.DB.Save(&request).Error
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
 
+	return nil
 }
 
 func (r *FriendshipRequestRepository) DeleteFriendshipRequest(requestID uuid.UUID) error {

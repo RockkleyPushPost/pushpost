@@ -25,7 +25,7 @@ func (r *UserRepository) RegisterUser(user *entity.User) error {
 
 func (r *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
 	var user entity.User
-	fmt.Println(r.DB)
+
 	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
 
 		return nil, err

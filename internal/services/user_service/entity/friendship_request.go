@@ -14,7 +14,7 @@ import (
 //)
 
 type FriendshipRequest struct {
-	ID            uuid.UUID `json:"id"`
+	UUID          uuid.UUID `json:"uuid"`
 	SenderUUID    uuid.UUID `json:"sender_uuid"`
 	RecipientUUID uuid.UUID `json:"recipient_uuid"`
 	Status        uint      `json:"status"`
