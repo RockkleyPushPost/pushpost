@@ -6,11 +6,12 @@ import (
 
 type UserRoutes struct {
 	GetUserByUUID fiber.Handler `method:"GET"`
-	GetFriends    fiber.Handler `method:"GET"`
+	GetFriends    fiber.Handler `method:"GET" secure:"true"`
 	Register      fiber.Handler `method:"POST"`
 	Login         fiber.Handler `method:"POST"`
 	AddFriend     fiber.Handler `method:"POST"`
 	DeleteFriend  fiber.Handler `method:"DELETE"`
+	GetByToken    fiber.Handler `method:"GET" secure:"true"`
 }
 
 type FriendshipRoutes struct {

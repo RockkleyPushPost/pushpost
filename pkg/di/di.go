@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"log"
+	"pushpost/pkg/middleware"
 	"reflect"
 	"strings"
 	"sync"
@@ -95,32 +96,39 @@ func (di *DI) RegisterRoutes(routes interface{}, pathPrefix string) error {
 		field := val.Field(j)
 		fieldType := typ.Field(j)
 
-		// Check if the field has a `method` tag
-		if method, ok := fieldType.Tag.Lookup("method"); ok {
-			// Construct the full path
-			path := pathPrefix + "/" + fieldType.Name
+		// Check if the field has a `method` and 'secure' tags
+		method, hasMethod := fieldType.Tag.Lookup("method")
+		secure, hasSecure := fieldType.Tag.Lookup("secure")
 
-			// Register the route using Fiber's routing methods
+		if hasMethod {
+			path := pathPrefix + "/" + fieldType.Name
 			handler := field.Interface().(fiber.Handler)
+
+			var handlers []fiber.Handler
+			if hasSecure && secure == "true" {
+				handlers = append(handlers, middleware.AuthJWTMiddleware("bullsonparade"))
+			}
+			handlers = append(handlers, handler)
+
 			switch method {
 			case "GET":
-				di.app.Get(path, handler)
+				di.app.Get(path, handlers...)
 			case "POST":
-				di.app.Post(path, handler)
+				di.app.Post(path, handlers...)
 			case "PUT":
-				di.app.Put(path, handler)
+				di.app.Put(path, handlers...)
 			case "DELETE":
-				di.app.Delete(path, handler)
+				di.app.Delete(path, handlers...)
 			case "PATCH":
-				di.app.Patch(path, handler)
+				di.app.Patch(path, handlers...)
 			case "HEAD":
-				di.app.Head(path, handler)
+				di.app.Head(path, handlers...)
 			case "OPTIONS":
-				di.app.Options(path, handler)
+				di.app.Options(path, handlers...)
 			case "CONNECT":
-				di.app.Connect(path, handler)
+				di.app.Connect(path, handlers...)
 			case "TRACE":
-				di.app.Trace(path, handler)
+				di.app.Trace(path, handlers...)
 			default:
 				return errors.New("unsupported HTTP method: " + method)
 			}

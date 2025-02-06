@@ -52,6 +52,7 @@ func Setup(cfg *config.Config) error {
 		Login:         userHandler.Login,
 		AddFriend:     userHandler.AddFriend,
 		DeleteFriend:  userHandler.DeleteFriend,
+		GetByToken:    userHandler.GetByToken,
 	}
 
 	friendshipRoutes := routing.FriendshipRoutes{
