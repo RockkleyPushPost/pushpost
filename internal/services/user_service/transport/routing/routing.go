@@ -1,22 +1,23 @@
 package routing
 
-import (
-	"github.com/gofiber/fiber/v2"
-)
+import "github.com/gofiber/fiber/v2"
+
+type AuthRoutes struct {
+	Register fiber.Handler `method:"POST"`
+	Login    fiber.Handler `method:"POST"`
+}
 
 type UserRoutes struct {
-	GetUserByUUID fiber.Handler `method:"GET"`
+	GetUserByUUID fiber.Handler `method:"GET" secure:"true"`
 	GetFriends    fiber.Handler `method:"GET" secure:"true"`
-	Register      fiber.Handler `method:"POST"`
-	Login         fiber.Handler `method:"POST"`
-	AddFriend     fiber.Handler `method:"POST"`
-	DeleteFriend  fiber.Handler `method:"DELETE"`
+	AddFriend     fiber.Handler `method:"POST" secure:"true"`
+	DeleteFriend  fiber.Handler `method:"DELETE" secure:"true"`
 	GetByToken    fiber.Handler `method:"GET" secure:"true"`
 }
 
 type FriendshipRoutes struct {
-	CreateFriendshipRequest              fiber.Handler `method:"POST"`
-	GetFriendshipRequestsByRecipientUUID fiber.Handler `method:"GET"`
-	UpdateFriendshipRequestStatus        fiber.Handler `method:"POST"`
-	DeleteFriendshipRequest              fiber.Handler `method:"DELETE"`
+	CreateFriendshipRequest              fiber.Handler `method:"POST" secure:"true"`
+	GetFriendshipRequestsByRecipientUUID fiber.Handler `method:"GET" secure:"true"`
+	UpdateFriendshipRequestStatus        fiber.Handler `method:"POST" secure:"true"`
+	DeleteFriendshipRequest              fiber.Handler `method:"DELETE" secure:"true"`
 }

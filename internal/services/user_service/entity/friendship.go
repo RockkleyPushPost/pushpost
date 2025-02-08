@@ -6,6 +6,6 @@ import (
 
 type Friendship struct {
 	gorm.Model
-	UserID   uint
-	FriendID uint
+	UserID   uint `json:"user_id"`
+	FriendID uint `json:"friend_id"`
 }

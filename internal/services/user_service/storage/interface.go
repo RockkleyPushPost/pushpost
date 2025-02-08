@@ -7,7 +7,7 @@ import (
 )
 
 type UserRepository interface {
-	RegisterUser(user *entity.User) error
+	CreateUser(user *entity.User) error
 	GetUserByEmail(email string) (*entity.User, error)
 	GetUserByUUID(uuid uuid.UUID) (*entity.User, error)
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)

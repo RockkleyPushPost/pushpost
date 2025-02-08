@@ -25,12 +25,13 @@ type FriendshipUseCase struct {
 }
 
 func NewFriendshipUseCase(friendshipRequestRepo storage.FriendRequestRepository, jwtSecret string) *FriendshipUseCase {
+
 	return &FriendshipUseCase{FriendshipRequestRepo: friendshipRequestRepo, JwtSecret: jwtSecret}
 }
 
 func (uc *FriendshipUseCase) CreateFriendshipRequest(dto dto.CreateFriendRequestDto) error {
 	request := entity.NewFriendshipRequest(dto.SenderUUID, dto.RecipientUUID)
-	request.UUID = uuid.New()
+
 	return uc.FriendshipRequestRepo.CreateFriendshipRequest(*request)
 }
 

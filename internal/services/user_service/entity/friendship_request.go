@@ -23,5 +23,5 @@ type FriendshipRequest struct {
 }
 
 func NewFriendshipRequest(senderUUID uuid.UUID, recipientUUID uuid.UUID) *FriendshipRequest {
-	return &FriendshipRequest{SenderUUID: senderUUID, RecipientUUID: recipientUUID, Status: 0}
+	return &FriendshipRequest{UUID: uuid.New(), SenderUUID: senderUUID, RecipientUUID: recipientUUID, Status: 0}
 }

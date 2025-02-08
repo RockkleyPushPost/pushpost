@@ -50,7 +50,7 @@ func (h *FriendshipHandler) GetFriendshipRequestsByRecipientUUID(c *fiber.Ctx) e
 }
 
 func (h *FriendshipHandler) UpdateFriendshipRequestStatus(c *fiber.Ctx) error {
-	// todo test it
+
 	var dto dto2.UpdateFriendshipRequestDto
 
 	if err := c.BodyParser(&dto); err != nil {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"pushpost/internal/config"
+	"pushpost/pkg/di"
 )
 
 const servName string = "UserService"
@@ -12,7 +13,7 @@ const servName string = "UserService"
 type Option func(*service)
 
 type service struct {
-	//container *di.Container
+	di     *di.DI
 	logger *log.Logger
 	config *config.Config
 }
@@ -41,6 +42,13 @@ func WithLogger(logger *log.Logger) Option {
 func WithConfig(config *config.Config) Option {
 	return func(s *service) {
 		s.config = config
+	}
+}
+
+func WithDI(container *di.DI) Option {
+	return func(s *service) {
+		s.di = container
+
 	}
 }
 

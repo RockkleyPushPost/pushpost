@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	//ctx, cancel := context.WithCancel(context.Background())
+	//defer cancel()
 
 	logger := initLogger()
 
@@ -22,24 +22,24 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	err = service.Setup(cfg)
+	_, err = service.Setup(cfg)
 
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	srv, err := service.NewService(
-		service.WithConfig(cfg),
-		//service.WithContainer(container),
-		service.WithLogger(logger),
-	)
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	go handleShutdown(ctx, cancel, srv, logger)
-
-	logger.Fatal(srv.Run(ctx))
+	//srv, err := service.NewService(
+	//	service.WithConfig(cfg),
+	//	service.WithDI(di),
+	//	service.WithLogger(logger),
+	//)
+	//if err != nil {
+	//	logger.Fatal(err)
+	//}
+	//
+	//go handleShutdown(ctx, cancel, srv, logger)
+	//
+	//logger.Fatal(srv.Run(ctx))
 
 }
 

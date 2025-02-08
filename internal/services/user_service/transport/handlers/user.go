@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"pushpost/internal/services/user_service/domain"
@@ -14,36 +15,6 @@ type UserHandler struct {
 
 func NewUserHandler(useCase domain.UserUseCase) *UserHandler {
 	return &UserHandler{UserUseCase: useCase}
-}
-
-func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
-	var body entity.User
-
-	if err := c.BodyParser(&body); err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	params := dto.RegisterUserDTO{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: body.Password,
-		Age:      body.Age,
-	}
-
-	if err := params.Validate(); err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	err := h.UserUseCase.RegisterUser(&params)
-
-	if err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User created successfully"})
 }
 
 func (h *UserHandler) GetUserByUUID(c *fiber.Ctx) error {
@@ -99,32 +70,6 @@ func (h *UserHandler) GetByToken(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(userData)
 }
 
-func (h *UserHandler) Login(c *fiber.Ctx) error {
-
-	var loginRequest dto.UserLoginDTO
-
-	if err := c.BodyParser(&loginRequest); err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request format:" + err.Error(),
-		})
-	}
-
-	token, err := h.UserUseCase.Login(loginRequest)
-
-	if err != nil {
-
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"token": token,
-		"type":  "Bearer",
-	})
-}
-
 func (h *UserHandler) GetFriends(c *fiber.Ctx) error {
 	//var userUUID struct {
 	//	Uuid string `json:"uuid"`
@@ -178,6 +123,11 @@ func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 	var friendshipRequest struct {
 		FriendEmail string `json:"friendEmail"`
 	}

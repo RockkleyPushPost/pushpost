@@ -17,8 +17,10 @@ type User struct {
 	Password          string `json:"password"`
 	Age               uint   `json:"age"`
 	LastTimeActivity  time.Time
-	IsEmailVerified   bool
-	VerificationToken string
+	IsEmailVerified   bool   `gorm:"default:false"`
+	VerificationToken string `gorm:"unique"`
+	OTPCode           string `gorm:"size:6"`
+	OTPExpiresAt      time.Time
 }
 
 func NewUser(dto dto.RegisterUserDTO) (*User, error) {
@@ -30,13 +32,17 @@ func NewUser(dto dto.RegisterUserDTO) (*User, error) {
 	}
 
 	return &User{
-		UUID:              uuid.New(),
-		Name:              dto.Name,
-		Email:             dto.Email,
-		Password:          string(hashedPassword),
-		Age:               dto.Age,
-		IsEmailVerified:   false,
-		VerificationToken: uuid.New().String(),
+		UUID:            uuid.New(),
+		Name:            dto.Name,
+		Email:           dto.Email,
+		Password:        string(hashedPassword),
+		Age:             dto.Age,
+		IsEmailVerified: false,
 	}, nil
 
+}
+
+type OTPToken struct {
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

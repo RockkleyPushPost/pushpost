@@ -18,7 +18,7 @@ func NewUserRepository(DB *gorm.DB) *UserRepository {
 	return &UserRepository{DB: DB}
 }
 
-func (r *UserRepository) RegisterUser(user *entity.User) error {
+func (r *UserRepository) CreateUser(user *entity.User) error {
 
 	return r.DB.Create(&user).Error
 }
@@ -104,6 +104,7 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 
 	if err != nil {
 		log.Println("user not found by UUID")
+
 		return err
 	}
 	friend, err := r.GetUserByEmail(dto.FriendEmail)
@@ -112,6 +113,7 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 
 		return err
 	}
+
 	//Check if friendship exists in either direction
 	result := r.DB.Where(
 		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
