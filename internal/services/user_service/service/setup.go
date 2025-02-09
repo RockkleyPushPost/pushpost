@@ -53,8 +53,9 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 	}
 
 	authRoutes := routing.AuthRoutes{
-		Register: authHandler.RegisterUser,
-		Login:    authHandler.Login,
+		Register:       authHandler.RegisterUser,
+		Login:          authHandler.Login,
+		VerifyEmailOTP: authHandler.VerifyEmailOTP,
 	}
 	userRoutes := routing.UserRoutes{
 		GetUserByUUID: userHandler.GetUserByUUID,

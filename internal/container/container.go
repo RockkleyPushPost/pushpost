@@ -10,7 +10,6 @@ type Container struct {
 	services sync.Map
 }
 
-// NewContainer initializes the DI container
 func NewContainer() *Container {
 	return &Container{}
 }

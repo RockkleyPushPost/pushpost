@@ -6,6 +6,7 @@ type AuthHandler interface {
 	RegisterUser(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
 	VerifyEmailOTP(c *fiber.Ctx) error
+	//SendOTP(c *fiber.Ctx) error
 }
 type UserHandler interface {
 	GetUserByUUID(c *fiber.Ctx) error

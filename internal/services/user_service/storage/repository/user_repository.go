@@ -135,3 +135,7 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
 		user.ID, friend.ID, friend.ID, user.ID).Delete(&entity.Friendship{}).Error
 }
+
+func (r *UserRepository) Update(user *entity.User) error {
+	return r.DB.Save(&user).Error
+}

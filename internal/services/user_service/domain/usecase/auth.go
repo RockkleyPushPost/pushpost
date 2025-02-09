@@ -95,7 +95,7 @@ func (u *AuthUseCase) VerifyEmailOTP(otp, email string) (bool, error) {
 	}
 
 	if user.IsEmailVerified {
-
+		// already verified
 		return true, nil
 	}
 
@@ -107,6 +107,15 @@ func (u *AuthUseCase) VerifyEmailOTP(otp, email string) (bool, error) {
 	if otp != user.OTPCode {
 
 		return false, errors.New("invalid verification code")
+	} else {
+		user.IsEmailVerified = true
+	}
+
+	err = u.UserRepo.Update(user)
+
+	if err != nil {
+
+		return false, err
 	}
 
 	return true, nil

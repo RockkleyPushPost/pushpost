@@ -90,6 +90,10 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
+//func (h *AuthHandler) SendOTP(c *fiber.Ctx) error {
+//
+//}
+
 func (h *AuthHandler) VerifyEmailOTP(c *fiber.Ctx) error {
 	var body struct {
 		Email string `json:"email"`

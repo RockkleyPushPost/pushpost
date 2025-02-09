@@ -13,6 +13,7 @@ type UserRepository interface {
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
 	AddFriend(userUUID uuid.UUID, friendEmail string) error
 	DeleteFriend(dto *dto.DeleteFriendDTO) error
+	Update(user *entity.User) error
 }
 
 type FriendRequestRepository interface {

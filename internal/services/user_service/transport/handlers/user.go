@@ -71,21 +71,6 @@ func (h *UserHandler) GetByToken(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) GetFriends(c *fiber.Ctx) error {
-	//var userUUID struct {
-	//	Uuid string `json:"uuid"`
-	//}
-	//
-	//if err := c.BodyParser(&userUUID); err != nil {
-	//
-	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	//		"error": "invalid request format",
-	//	})
-	//}
-	//token := strings.Split(c.GetReqHeaders()["Authorization"][0], " ")[1]
-	//fmt.Println(token)
-	//userUuid, err := jwt.VerifyToken(token, "shenanigans")
-	//fmt.Println(userUuid)
-	//os.Exit(1)
 	userUUID := c.Locals("userUUID").(uuid.UUID)
 	friends, err := h.UserUseCase.GetFriends(userUUID)
 
@@ -109,7 +94,7 @@ func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
 			"error": "invalid request format",
 		})
 	}
-	userUUID := c.Locals("userUUID").(uuid.UUID)
+	userUUID := c.Locals("userUUID").(uuid.UUID) // fixme
 
 	prop := dto.DeleteFriendDTO{UserUUID: userUUID, FriendEmail: data.FriendEmail}
 	err := h.UserUseCase.DeleteFriend(&prop)
@@ -128,6 +113,7 @@ func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
 			fmt.Println(err)
 		}
 	}()
+
 	var friendshipRequest struct {
 		FriendEmail string `json:"friendEmail"`
 	}
