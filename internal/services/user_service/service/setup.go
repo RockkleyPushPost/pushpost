@@ -36,7 +36,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 
 	// Friendship
 	var friendshipRepository storage.FriendRequestRepository = &repository.FriendshipRequestRepository{}
-	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{}
+	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{JwtSecret: jwtSecret}
 	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
 
 	if err = DI.Register(

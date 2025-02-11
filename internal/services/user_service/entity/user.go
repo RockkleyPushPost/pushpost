@@ -14,13 +14,12 @@ type User struct {
 	Name  string `json:"name"`
 	Email string `json:"email" gorm:"unique"`
 	//TelegramID        string `json:"telegramID"`
-	Password          string `json:"password"`
-	Age               uint   `json:"age"`
-	LastTimeActivity  time.Time
-	IsEmailVerified   bool   `gorm:"default:false"`
-	VerificationToken string `gorm:"unique"`
-	OTPCode           string `gorm:"size:6"`
-	OTPExpiresAt      time.Time
+	Password         string `json:"password"`
+	Age              uint   `json:"age"`
+	LastTimeActivity time.Time
+	IsEmailVerified  bool   `gorm:"default:false"`
+	OTPCode          string `gorm:"size:6"`
+	OTPExpiresAt     time.Time
 }
 
 func NewUser(dto dto.RegisterUserDTO) (*User, error) {

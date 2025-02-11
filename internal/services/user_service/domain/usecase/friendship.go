@@ -6,6 +6,7 @@ import (
 	"pushpost/internal/services/user_service/domain/dto"
 	"pushpost/internal/services/user_service/entity"
 	"pushpost/internal/services/user_service/storage"
+	"pushpost/pkg/jwt"
 )
 
 //type FriendRequestStatus string
@@ -21,6 +22,7 @@ var _ domain.FriendshipUseCase = &FriendshipUseCase{}
 
 type FriendshipUseCase struct {
 	FriendshipRequestRepo storage.FriendRequestRepository `bind:"friendship_repo"`
+	UserRepo              storage.UserRepository          `bind:"user_repo"`
 	JwtSecret             string
 }
 
@@ -30,7 +32,18 @@ func NewFriendshipUseCase(friendshipRequestRepo storage.FriendRequestRepository,
 }
 
 func (uc *FriendshipUseCase) CreateFriendshipRequest(dto dto.CreateFriendRequestDto) error {
-	request := entity.NewFriendshipRequest(dto.SenderUUID, dto.RecipientUUID)
+	claims, err := jwt.VerifyToken(dto.SenderToken, uc.JwtSecret)
+	if err != nil {
+		return err
+	}
+
+	senderUUID := claims["userUUID"].(string)
+	sender, err := uc.UserRepo.GetUserByUUID(uuid.MustParse(senderUUID))
+	if err != nil {
+		return err
+	}
+
+	request := entity.NewFriendshipRequest(sender.Email, dto.RecipientEmail)
 
 	return uc.FriendshipRequestRepo.CreateFriendshipRequest(*request)
 }

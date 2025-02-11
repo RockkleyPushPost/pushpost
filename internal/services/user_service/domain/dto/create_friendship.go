@@ -2,26 +2,25 @@ package dto
 
 import (
 	"errors"
-	"github.com/google/uuid"
 )
 
-type FriendshipDTO struct {
-	UserUUID   uuid.UUID `json:"userUUID"`
-	FriendUUID uuid.UUID `json:"friendUUID"`
+type CreateFriendshipDTO struct {
+	SenderUUID    string `json:"senderUUID"`
+	RecipientUUID string `json:"recipientUUID"`
 }
 
-func (dto *FriendshipDTO) Validate() error {
-	if dto.UserUUID == dto.FriendUUID {
+func (dto *CreateFriendshipDTO) Validate() error {
+	if dto.SenderUUID == dto.RecipientUUID {
 
 		return errors.New("uuid must be different")
 	}
 
-	if dto.UserUUID == uuid.Nil {
+	if dto.SenderUUID == "" {
 
 		return errors.New("missing user uuid")
 	}
 
-	if dto.FriendUUID == uuid.Nil {
+	if dto.RecipientUUID == "" {
 
 		return errors.New("missing friend uuid")
 	}
