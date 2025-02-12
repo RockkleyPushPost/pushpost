@@ -90,9 +90,26 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
-//func (h *AuthHandler) SendOTP(c *fiber.Ctx) error {
-//
-//}
+func (h *AuthHandler) SendNewOTP(c *fiber.Ctx) error {
+	var body struct {
+		Email string `json:"email"`
+	}
+
+	if err := c.BodyParser(&body); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid request format:" + err.Error()})
+	}
+
+	err := h.AuthUseCase.SendNewOTP(body.Email)
+
+	if err != nil {
+
+		return err
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "New otp sent to " + body.Email})
+}
 
 func (h *AuthHandler) VerifyEmailOTP(c *fiber.Ctx) error {
 	var body struct {

@@ -48,7 +48,7 @@ func (uc *FriendshipUseCase) CreateFriendshipRequest(dto dto.CreateFriendRequest
 	return uc.FriendshipRequestRepo.CreateFriendshipRequest(*request)
 }
 
-func (uc *FriendshipUseCase) GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error) {
+func (uc *FriendshipUseCase) FindFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error) {
 	//TODO implement me
 	panic("implement me")
 }

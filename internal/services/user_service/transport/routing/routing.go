@@ -6,6 +6,7 @@ type AuthRoutes struct {
 	Register       fiber.Handler `method:"POST"`
 	Login          fiber.Handler `method:"POST"`
 	VerifyEmailOTP fiber.Handler `method:"POST"`
+	SendNewOTP     fiber.Handler `method:"POST"`
 }
 
 type UserRoutes struct {

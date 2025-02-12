@@ -18,7 +18,7 @@ type UserRepository interface {
 
 type FriendRequestRepository interface {
 	CreateFriendshipRequest(request entity.FriendshipRequest) error
-	GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
+	FindFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
 	UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error
 	DeleteFriendshipRequest(requestID uuid.UUID) error
 }

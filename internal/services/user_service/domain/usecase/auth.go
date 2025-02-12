@@ -35,16 +35,19 @@ func (u *AuthUseCase) RegisterUser(dto *dto.RegisterUserDTO) error {
 		return err
 	}
 
-	otpToken := utils.GenerateOTP()
-	expiry := utils.OTPExpiry()
-	user.OTPCode, user.OTPExpiresAt = otpToken, expiry
-
 	if err = u.UserRepo.CreateUser(user); err != nil {
 
 		return err
 	}
 
-	return email.SendEmail(dto.Email, otpToken)
+	err = u.SendNewOTP(user.Email)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
 }
 
 func (u *AuthUseCase) Login(dto dto.UserLoginDTO) (string, error) {
@@ -84,6 +87,36 @@ func (u *AuthUseCase) Login(dto dto.UserLoginDTO) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (u *AuthUseCase) SendNewOTP(emailAddress string) error {
+	user, err := u.UserRepo.GetUserByEmail(emailAddress)
+
+	if err != nil {
+
+		return err
+	}
+
+	newOTP := utils.NewOTP()
+	message := fmt.Sprintf("Your verification code is: %s\nIt will expire in 5 minutes.", newOTP.Code)
+	subject := "Email verification"
+	err = email.SendEmail(user.Email, subject, message)
+
+	if err != nil {
+
+		return err
+	}
+
+	user.OTPCode, user.OTPExpiresAt = newOTP.Code, newOTP.Expiry
+
+	err = u.UserRepo.Update(user)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
 }
 
 func (u *AuthUseCase) VerifyEmailOTP(otp, email string) (bool, error) {

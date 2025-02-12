@@ -1,7 +1,6 @@
 package transport
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"pushpost/internal/services/user_service/domain"
 	dto2 "pushpost/internal/services/user_service/domain/dto"
@@ -30,7 +29,6 @@ func (h *FriendshipHandler) CreateFriendshipRequest(c *fiber.Ctx) error {
 	err := h.FriendshipUseCase.CreateFriendshipRequest(dto)
 
 	if err != nil {
-		fmt.Println(err.Error())
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -39,9 +37,24 @@ func (h *FriendshipHandler) CreateFriendshipRequest(c *fiber.Ctx) error {
 
 }
 
-func (h *FriendshipHandler) GetFriendshipRequestsByRecipientUUID(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
+func (h *FriendshipHandler) FindFriendshipRequestsByRecipientUUID(c *fiber.Ctx) error {
+	//var body struct {
+	//	RecipientToken string `json:"recipientToken"`
+	//}
+	//if err := c.BodyParser(&body); err != nil {
+	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	//}
+	//
+	////requests, err := h.FriendshipUseCase.FindFriendshipRequestsByRecipientUUID(body)
+	//
+	//if err != nil {
+	//
+	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	//}
+	//
+	//return c.Status(fiber.StatusCreated).JSON(requests)
+	return nil
+
 }
 
 func (h *FriendshipHandler) UpdateFriendshipRequestStatus(c *fiber.Ctx) error {

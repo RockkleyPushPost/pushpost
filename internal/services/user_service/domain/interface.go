@@ -10,6 +10,7 @@ type AuthUseCase interface {
 	RegisterUser(dto *dto.RegisterUserDTO) (err error)
 	Login(dto dto.UserLoginDTO) (string, error)
 	IsEmailVerified(email string) (bool, error)
+	SendNewOTP(email string) error
 	VerifyEmailOTP(otp, email string) (bool, error)
 }
 
@@ -23,7 +24,7 @@ type UserUseCase interface {
 
 type FriendshipUseCase interface {
 	CreateFriendshipRequest(dto dto.CreateFriendRequestDto) error
-	GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
+	FindFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
 	UpdateFriendshipRequestStatus(dto.UpdateFriendshipRequestDto) error
 	DeleteFriendshipRequest(dto.DeleteFriendshipRequestDto) error
 }

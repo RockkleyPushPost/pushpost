@@ -20,9 +20,12 @@ func (r *FriendshipRequestRepository) CreateFriendshipRequest(request entity.Fri
 	return r.DB.Create(&request).Error
 }
 
-func (r *FriendshipRequestRepository) GetFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *FriendshipRequestRepository) FindFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error) {
+	var requests []entity.FriendshipRequest
+
+	err := r.DB.Where("recipient_uuid = ?", recipientUUID).Find(&requests).Error
+
+	return requests, err
 }
 
 func (r *FriendshipRequestRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error {

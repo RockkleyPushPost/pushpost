@@ -6,7 +6,7 @@ type AuthHandler interface {
 	RegisterUser(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
 	VerifyEmailOTP(c *fiber.Ctx) error
-	//SendOTP(c *fiber.Ctx) error
+	SendNewOTP(c *fiber.Ctx) error
 }
 type UserHandler interface {
 	GetUserByUUID(c *fiber.Ctx) error
@@ -20,7 +20,7 @@ type UserHandler interface {
 
 type FriendshipHandler interface {
 	CreateFriendshipRequest(c *fiber.Ctx) error
-	GetFriendshipRequestsByRecipientUUID(c *fiber.Ctx) error
+	FindFriendshipRequestsByRecipientUUID(c *fiber.Ctx) error
 	UpdateFriendshipRequestStatus(c *fiber.Ctx) error
 	DeleteFriendshipRequest(c *fiber.Ctx) error
 }

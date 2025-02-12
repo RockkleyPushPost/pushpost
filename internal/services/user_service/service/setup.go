@@ -56,6 +56,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 		Register:       authHandler.RegisterUser,
 		Login:          authHandler.Login,
 		VerifyEmailOTP: authHandler.VerifyEmailOTP,
+		SendNewOTP:     authHandler.SendNewOTP,
 	}
 	userRoutes := routing.UserRoutes{
 		GetUserByUUID: userHandler.GetUserByUUID,
@@ -67,7 +68,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 
 	friendshipRoutes := routing.FriendshipRoutes{
 		CreateFriendshipRequest:              friendshipHandler.CreateFriendshipRequest,
-		GetFriendshipRequestsByRecipientUUID: friendshipHandler.GetFriendshipRequestsByRecipientUUID,
+		GetFriendshipRequestsByRecipientUUID: friendshipHandler.FindFriendshipRequestsByRecipientUUID,
 		UpdateFriendshipRequestStatus:        friendshipHandler.UpdateFriendshipRequestStatus,
 		DeleteFriendshipRequest:              friendshipHandler.DeleteFriendshipRequest,
 	}
@@ -84,7 +85,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 		log.Fatalf("failed to register routes: %v", err)
 		return nil, err
 	}
-
+	//db.AutoMigrate(&entity.User{})
 	log.Println("Server started on :8080")
 	if err := app.Listen(":8080"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)

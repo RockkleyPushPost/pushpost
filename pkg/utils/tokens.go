@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+type OTP struct {
+	Code   string
+	Expiry time.Time
+}
+
+func NewOTP() *OTP {
+	return &OTP{Code: GenerateOTP(), Expiry: OTPExpiry()}
+}
+
 func GenerateToken() (string, error) {
 	bytes := make([]byte, 32)
 	if _, err := crand.Read(bytes); err != nil {
