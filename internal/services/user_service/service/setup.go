@@ -35,7 +35,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 	var userHandler transport2.UserHandler = &transport.UserHandler{}
 
 	// Friendship
-	var friendshipRepository storage.FriendRequestRepository = &repository.FriendshipRequestRepository{}
+	var friendshipRepository storage.FriendshipRepository = &repository.FriendshipRepository{}
 	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{JwtSecret: jwtSecret}
 	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
 

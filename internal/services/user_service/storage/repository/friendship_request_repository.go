@@ -7,44 +7,52 @@ import (
 	"pushpost/internal/services/user_service/entity"
 )
 
-type FriendshipRequestRepository struct {
+type FriendshipRepository struct {
 	DB *gorm.DB `bind:"*gorm.DB"`
 }
 
-func NewFriendshipRequestRepository(DB *gorm.DB) *FriendshipRequestRepository {
-	return &FriendshipRequestRepository{DB: DB}
+func NewFriendshipRepository(DB *gorm.DB) *FriendshipRepository {
+	return &FriendshipRepository{DB: DB}
 }
 
-func (r *FriendshipRequestRepository) CreateFriendshipRequest(request entity.FriendshipRequest) error {
+func (r *FriendshipRepository) CreateFriendshipRequest(request entity.FriendshipRequest) error {
 
 	return r.DB.Create(&request).Error
 }
 
-func (r *FriendshipRequestRepository) FindFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error) {
+func (r *FriendshipRepository) FindByUserUUID(dto dto.FindByUserUUIDDto) ([]entity.FriendshipRequest, error) {
 	var requests []entity.FriendshipRequest
 
-	err := r.DB.Where("recipient_uuid = ?", recipientUUID).Find(&requests).Error
+	err := r.DB.Where(
+		"(sender_uuid = ? AND recipient_uuid = ?) OR (sender_uuid = ? AND recipient_uuid = ?)",
+		dto.FirstUserUUID,
+		dto.SecondUserUUID,
+		dto.SecondUserUUID,
+		dto.FirstUserUUID,
+	).Find(&requests).Error
 
 	return requests, err
 }
 
-func (r *FriendshipRequestRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error {
+func (r *FriendshipRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error {
 	result := r.DB.Model(&entity.FriendshipRequest{}).
 		Where("uuid = ?", dto.RequestUUID).
 		Update("status", dto.Status)
 
 	if result.Error != nil {
+
 		return result.Error
 	}
 
 	if result.RowsAffected == 0 {
+
 		return gorm.ErrRecordNotFound
 	}
 
 	return nil
 }
 
-func (r *FriendshipRequestRepository) DeleteFriendshipRequest(requestID uuid.UUID) error {
+func (r *FriendshipRepository) DeleteFriendshipRequest(requestID uuid.UUID) error {
 	//TODO implement me
 	panic("implement me")
 }

@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"pushpost/internal/services/user_service/domain"
 	dto2 "pushpost/internal/services/user_service/domain/dto"
@@ -19,16 +20,20 @@ func (h *FriendshipHandler) CreateFriendshipRequest(c *fiber.Ctx) error {
 	var dto dto2.CreateFriendRequestDto
 
 	if err := c.BodyParser(&dto); err != nil {
+		fmt.Println(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	if err := dto.Validate(); err != nil {
+		fmt.Println(err)
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	err := h.FriendshipUseCase.CreateFriendshipRequest(dto)
 
 	if err != nil {
+		fmt.Println(err)
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

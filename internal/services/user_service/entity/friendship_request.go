@@ -14,14 +14,14 @@ import (
 //)
 
 type FriendshipRequest struct {
-	UUID           uuid.UUID `json:"uuid"`
-	SenderEmail    string    `json:"senderEmail"`
-	RecipientEmail string    `json:"recipientEmail"`
-	Status         uint      `json:"status"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	UUID          uuid.UUID `json:"uuid"`
+	SenderUUID    uuid.UUID `json:"senderUUID"`
+	RecipientUUID uuid.UUID `json:"recipientUUID"`
+	Status        uint      `json:"status"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
-func NewFriendshipRequest(senderToken string, recipientEmail string) *FriendshipRequest {
-	return &FriendshipRequest{UUID: uuid.New(), SenderEmail: senderToken, RecipientEmail: recipientEmail, Status: 0}
+func NewFriendshipRequest(senderUUID uuid.UUID, recipientUUID uuid.UUID) *FriendshipRequest {
+	return &FriendshipRequest{UUID: uuid.New(), SenderUUID: senderUUID, RecipientUUID: recipientUUID, Status: 0}
 }

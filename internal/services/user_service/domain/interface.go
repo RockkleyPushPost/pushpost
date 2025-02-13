@@ -24,7 +24,7 @@ type UserUseCase interface {
 
 type FriendshipUseCase interface {
 	CreateFriendshipRequest(dto dto.CreateFriendRequestDto) error
-	FindFriendshipRequestsByRecipientUUID(recipientUUID uuid.UUID) ([]entity.FriendshipRequest, error)
+	FindByUserUUID(dto dto.FindByUserUUIDDto) ([]entity.FriendshipRequest, error)
 	UpdateFriendshipRequestStatus(dto.UpdateFriendshipRequestDto) error
 	DeleteFriendshipRequest(dto.DeleteFriendshipRequestDto) error
 }
