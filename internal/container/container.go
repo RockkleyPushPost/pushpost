@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// Container holds dependencies with strict type safety
+// Container holds dependencies with strict type safety.
 type Container struct {
 	services sync.Map
 }
@@ -14,7 +14,7 @@ func NewContainer() *Container {
 	return &Container{}
 }
 
-// Register stores a dependency of a specific concrete type
+// Register stores a dependency of a specific concrete type.
 func (c *Container) Register(service interface{}) {
 	if service == nil {
 		panic("cannot register a nil service")
@@ -22,7 +22,7 @@ func (c *Container) Register(service interface{}) {
 	c.services.Store(service, service)
 }
 
-// Resolve retrieves a dependency by type
+// Resolve retrieves a dependency by type.
 func (c *Container) Resolve(service interface{}) (interface{}, error) {
 	if service == nil {
 		return nil, errors.New("service cannot be nil")
@@ -34,7 +34,7 @@ func (c *Container) Resolve(service interface{}) (interface{}, error) {
 	return nil, errors.New("service not found: " + service.(string))
 }
 
-// MustResolve retrieves a service and panics if not found
+// MustResolve retrieves a service and panics if not found.
 func (c *Container) MustResolve(service interface{}) interface{} {
 	resolved, err := c.Resolve(service)
 	if err != nil {

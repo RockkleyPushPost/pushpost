@@ -1,6 +1,8 @@
 package transport
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 type AuthHandler interface {
 	RegisterUser(c *fiber.Ctx) error
@@ -14,7 +16,7 @@ type UserHandler interface {
 
 	GetByToken(c *fiber.Ctx) error
 	GetFriends(c *fiber.Ctx) error
-	AddFriend(c *fiber.Ctx) error
+	//AddFriend(c *fiber.Ctx) error
 	DeleteFriend(c *fiber.Ctx) error
 }
 
@@ -23,6 +25,8 @@ type FriendshipHandler interface {
 	FindFriendshipRequestsByRecipientUUID(c *fiber.Ctx) error
 	UpdateFriendshipRequestStatus(c *fiber.Ctx) error
 	DeleteFriendshipRequest(c *fiber.Ctx) error
+	AcceptFriendshipRequest(c *fiber.Ctx) error
+	DeclineFriendshipRequest(c *fiber.Ctx) error
 }
 
 type Handler interface {

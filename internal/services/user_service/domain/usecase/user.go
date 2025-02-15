@@ -32,11 +32,6 @@ func (u *UserUseCase) GetByEmail(email string) (*entity.User, error) {
 	return u.UserRepo.GetUserByEmail(email)
 }
 
-func (u *UserUseCase) AddFriend(userUUID uuid.UUID, email string) error {
-
-	return u.UserRepo.AddFriend(userUUID, email)
-}
-
 func (u *UserUseCase) GetFriends(userUUID uuid.UUID) ([]entity.User, error) {
 
 	return u.UserRepo.GetFriends(userUUID)

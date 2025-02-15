@@ -22,4 +22,6 @@ type FriendshipRoutes struct {
 	GetFriendshipRequestsByRecipientUUID fiber.Handler `method:"GET" secure:"true"`
 	UpdateFriendshipRequestStatus        fiber.Handler `method:"POST" secure:"true"`
 	DeleteFriendshipRequest              fiber.Handler `method:"DELETE" secure:"true"`
+
+	AcceptFriendshipRequest fiber.Handler `method:"POST" secure:"true"`
 }

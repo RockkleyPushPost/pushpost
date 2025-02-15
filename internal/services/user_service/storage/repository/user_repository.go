@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -54,48 +53,13 @@ func (r *UserRepository) GetFriends(userUUID uuid.UUID) ([]entity.User, error) {
 	}
 
 	err = r.DB.
-		Joins("JOIN friendships ON users.id = friendships.friend_id").
-		Where("friendships.user_id = ? AND friendships.deleted_at IS NULL", user.ID).
-		Or("friendships.friend_id = ? AND friendships.deleted_at IS NULL", user.ID).
+		Joins("JOIN friendships ON users.uuid = friendships.friend_uuid").
+		Where("friendships.user_uuid = ? AND friendships.deleted_at IS NULL", user.UUID).
+		Or("friendships.friend_uuid = ? AND friendships.deleted_at IS NULL", user.UUID).
 		Where("users.deleted_at IS NULL").
 		Find(&friends).Error
 
 	return friends, err
-}
-func (r *UserRepository) AddFriend(userUUID uuid.UUID, friendEmail string) error {
-	var existingFriendship entity.Friendship
-
-	user, err := r.GetUserByUUID(userUUID)
-
-	if err != nil {
-		log.Println("user not found by UUID")
-		return err
-	}
-	friend, err := r.GetUserByEmail(friendEmail)
-
-	if err != nil {
-
-		return err
-	}
-	//Check if friendship already exists in either direction
-	result := r.DB.Where(
-		"(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
-		user.ID, friend.ID, friend.ID, user.ID,
-	).First(&existingFriendship)
-
-	if result.Error == nil {
-
-		return fmt.Errorf("friendship already exists")
-	}
-
-	if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
-
-		return result.Error
-	}
-
-	friendship := entity.Friendship{UserID: user.ID, FriendID: friend.ID}
-
-	return r.DB.Create(&friendship).Error
 }
 
 func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {

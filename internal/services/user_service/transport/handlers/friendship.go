@@ -111,4 +111,51 @@ func (h *FriendshipHandler) DeleteFriendshipRequest(c *fiber.Ctx) error {
 
 }
 
+func (h *FriendshipHandler) AcceptFriendshipRequest(c *fiber.Ctx) error {
+	var dto dto2.UpdateFriendshipRequestDto
+
+	if err := c.BodyParser(&dto); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := dto.Validate(); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	err := h.FriendshipUseCase.AcceptFriendshipRequest(dto.RequestUUID)
+
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "friendship created successfully"})
+}
+
+func (h *FriendshipHandler) DeclineFriendshipRequest(c *fiber.Ctx) error {
+	var dto dto2.UpdateFriendshipRequestDto
+
+	if err := c.BodyParser(&dto); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := dto.Validate(); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	err := h.FriendshipUseCase.DeclineFriendshipRequest(dto.RequestUUID)
+
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "friendship created successfully"})
+
+}
+
 func (h *FriendshipHandler) Handler() {}

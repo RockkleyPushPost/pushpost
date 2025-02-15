@@ -11,6 +11,11 @@ type FriendshipRepository struct {
 	DB *gorm.DB `bind:"*gorm.DB"`
 }
 
+func (r *FriendshipRepository) CreateFriendship(friendship *entity.Friendship) error {
+	return r.DB.Create(&friendship).Error
+
+}
+
 func NewFriendshipRepository(DB *gorm.DB) *FriendshipRepository {
 	return &FriendshipRepository{DB: DB}
 }
@@ -20,8 +25,8 @@ func (r *FriendshipRepository) CreateFriendshipRequest(request entity.Friendship
 	return r.DB.Create(&request).Error
 }
 
-func (r *FriendshipRepository) FindByUserUUID(dto dto.FindByUserUUIDDto) ([]entity.FriendshipRequest, error) {
-	var requests []entity.FriendshipRequest
+func (r *FriendshipRepository) FindRequestByPairUUID(dto dto.FindByPairUUID) (entity.FriendshipRequest, error) {
+	var requests entity.FriendshipRequest
 
 	err := r.DB.Where(
 		"(sender_uuid = ? AND recipient_uuid = ?) OR (sender_uuid = ? AND recipient_uuid = ?)",
@@ -32,6 +37,31 @@ func (r *FriendshipRepository) FindByUserUUID(dto dto.FindByUserUUIDDto) ([]enti
 	).Find(&requests).Error
 
 	return requests, err
+}
+
+func (r *FriendshipRepository) FindFriendshipByPairUUID(dto dto.FindByPairUUID) (entity.Friendship, error) {
+	var requests entity.Friendship
+
+	err := r.DB.Where(
+		"(user_uuid = ? AND friend_uuid = ?) OR (user_uuid = ? AND friend_uuid = ?)",
+		dto.FirstUserUUID,
+		dto.SecondUserUUID,
+		dto.SecondUserUUID,
+		dto.FirstUserUUID,
+	).Find(&requests).Error
+
+	return requests, err
+}
+
+func (r *FriendshipRepository) GetRequestByUUID(requestUUID uuid.UUID) (*entity.FriendshipRequest, error) {
+	var request entity.FriendshipRequest
+
+	if err := r.DB.Where("uuid = ?", requestUUID).First(&request).Error; err != nil {
+
+		return nil, err
+	}
+
+	return &request, nil
 }
 
 func (r *FriendshipRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFriendshipRequestDto) error {

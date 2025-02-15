@@ -1,7 +1,6 @@
 package transport
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"pushpost/internal/services/user_service/domain"
@@ -107,34 +106,34 @@ func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Friendship destroyed successfully"})
 }
 
-func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println(err)
-		}
-	}()
-
-	var friendshipRequest struct {
-		FriendEmail string `json:"friendEmail"`
-	}
-
-	if err := c.BodyParser(&friendshipRequest); err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request format",
-		})
-	}
-
-	userUUID := c.Locals("userUUID").(uuid.UUID)
-	err := h.UserUseCase.AddFriend(userUUID, friendshipRequest.FriendEmail)
-
-	if err != nil {
-
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship created successfully"})
-
-}
+//func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
+//	defer func() {
+//		if err := recover(); err != nil {
+//			fmt.Println(err)
+//		}
+//	}()
+//
+//	var friendshipRequest struct {
+//		FriendEmail string `json:"friendEmail"`
+//	}
+//
+//	if err := c.BodyParser(&friendshipRequest); err != nil {
+//
+//		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+//			"error": "invalid request format",
+//		})
+//	}
+//
+//	userUUID := c.Locals("userUUID").(uuid.UUID)
+//	err := h.UserUseCase.AddFriend(userUUID, friendshipRequest.FriendEmail)
+//
+//	if err != nil {
+//
+//		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+//	}
+//
+//	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Friendship created successfully"})
+//
+//}
 
 func (h *UserHandler) Handler() {}

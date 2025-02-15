@@ -48,15 +48,15 @@ func (uc *FriendshipUseCase) CreateFriendshipRequest(prop dto.CreateFriendReques
 		return err
 	}
 
-	existsDto := dto.FindByUserUUIDDto{FirstUserUUID: uuid.MustParse(senderUUID), SecondUserUUID: recipient.UUID}
-	exists, err := uc.FindByUserUUID(existsDto)
+	existsDto := dto.FindByPairUUID{FirstUserUUID: uuid.MustParse(senderUUID), SecondUserUUID: recipient.UUID}
+	exists, err := uc.FindRequestByPairUUID(existsDto)
 
 	if err != nil {
 
 		return err
 	}
 
-	if len(exists) > 0 {
+	if exists.UUID != uuid.Nil {
 
 		return errors.New("friend request already exists")
 	}
@@ -66,8 +66,8 @@ func (uc *FriendshipUseCase) CreateFriendshipRequest(prop dto.CreateFriendReques
 	return uc.FriendshipRepo.CreateFriendshipRequest(*request)
 }
 
-func (uc *FriendshipUseCase) FindByUserUUID(dto dto.FindByUserUUIDDto) ([]entity.FriendshipRequest, error) {
-	return uc.FriendshipRepo.FindByUserUUID(dto)
+func (uc *FriendshipUseCase) FindRequestByPairUUID(dto dto.FindByPairUUID) (entity.FriendshipRequest, error) {
+	return uc.FriendshipRepo.FindRequestByPairUUID(dto)
 }
 
 func (uc *FriendshipUseCase) UpdateFriendshipRequestStatus(requestDto dto.UpdateFriendshipRequestDto) error {
@@ -76,7 +76,61 @@ func (uc *FriendshipUseCase) UpdateFriendshipRequestStatus(requestDto dto.Update
 
 }
 
-func (uc *FriendshipUseCase) DeleteFriendshipRequest(dto.DeleteFriendshipRequestDto) error {
+func (uc *FriendshipUseCase) DeleteFriendshipRequest(dto dto.DeleteFriendshipRequestDto) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (uc *FriendshipUseCase) AcceptFriendshipRequest(requestUUID uuid.UUID) error {
+	prop := dto.UpdateFriendshipRequestDto{
+		RequestUUID: requestUUID,
+		Status:      1,
+	}
+
+	err := uc.FriendshipRepo.UpdateFriendshipRequestStatus(prop)
+
+	if err != nil {
+
+		return err
+	}
+
+	return uc.CreateFriendship(requestUUID)
+}
+
+func (uc *FriendshipUseCase) DeclineFriendshipRequest(requestUUID uuid.UUID) error {
+	prop := dto.UpdateFriendshipRequestDto{
+		RequestUUID: requestUUID,
+		Status:      2,
+	}
+
+	return uc.FriendshipRepo.UpdateFriendshipRequestStatus(prop)
+
+}
+
+func (uc *FriendshipUseCase) CreateFriendship(requestUUID uuid.UUID) error {
+	var existingFriendship entity.Friendship
+
+	request, err := uc.FriendshipRepo.GetRequestByUUID(requestUUID)
+	if err != nil {
+		return err
+	}
+
+	//Check if friendship already exists in either direction
+	if existingFriendship, err = uc.FriendshipRepo.FindFriendshipByPairUUID(
+		dto.FindByPairUUID{
+			FirstUserUUID: request.SenderUUID, SecondUserUUID: request.RecipientUUID}); err != nil {
+		return err
+	}
+	if existingFriendship.UUID != uuid.Nil {
+		return errors.New("friendship already exists")
+	}
+
+	friendship := entity.Friendship{
+		UUID:       uuid.New(),
+		UserUUID:   request.SenderUUID,
+		FriendUUID: request.RecipientUUID,
+	}
+
+	return uc.FriendshipRepo.CreateFriendship(&friendship)
+
 }

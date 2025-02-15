@@ -61,7 +61,6 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 	userRoutes := routing.UserRoutes{
 		GetUserByUUID: userHandler.GetUserByUUID,
 		GetFriends:    userHandler.GetFriends,
-		AddFriend:     userHandler.AddFriend,
 		DeleteFriend:  userHandler.DeleteFriend,
 		GetByToken:    userHandler.GetByToken,
 	}
@@ -71,6 +70,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 		GetFriendshipRequestsByRecipientUUID: friendshipHandler.FindFriendshipRequestsByRecipientUUID,
 		UpdateFriendshipRequestStatus:        friendshipHandler.UpdateFriendshipRequestStatus,
 		DeleteFriendshipRequest:              friendshipHandler.DeleteFriendshipRequest,
+		AcceptFriendshipRequest:              friendshipHandler.AcceptFriendshipRequest,
 	}
 
 	if err = DI.RegisterRoutes(authRoutes, "/auth"); err != nil {
