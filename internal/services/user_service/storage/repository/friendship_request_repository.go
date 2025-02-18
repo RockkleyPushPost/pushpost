@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"pushpost/internal/services/user_service/domain/dto"
@@ -46,7 +47,7 @@ func (r *FriendshipRepository) FindFriendshipByPairUUID(dto dto.FindByPairUUID) 
 		"(user_uuid = ? AND friend_uuid = ?) OR (user_uuid = ? AND friend_uuid = ?)",
 		dto.FirstUserUUID,
 		dto.SecondUserUUID,
-		dto.SecondUserUUID,
+		dto.SecondUserUUID, // TODO Merge in one method FindFriendshipDTO & FindFriendshipRequestDTO
 		dto.FirstUserUUID,
 	).Find(&requests).Error
 
@@ -85,4 +86,51 @@ func (r *FriendshipRepository) UpdateFriendshipRequestStatus(dto dto.UpdateFrien
 func (r *FriendshipRepository) DeleteFriendshipRequest(requestID uuid.UUID) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+//func (r *FriendshipRepository) FindIncomingRequests(userUUID uuid.UUID) {
+//	requests := r.DB.Where("recipient_uuid = ?", userUUID)
+//}
+
+func (r *FriendshipRepository) FindFriendshipRequest(dto *dto.FindFriendshipRequestDTO) ([]*entity.FriendshipRequest, error) {
+	query := r.DB.
+		Where("status = ?", dto.Status)
+
+	if dto.SenderUUID != uuid.Nil {
+		query = query.Where("sender_uuid = ?", dto.SenderUUID)
+	}
+
+	if dto.RecipientUUID != uuid.Nil {
+		query = query.Where("recipient_uuid = ?", dto.RecipientUUID)
+	}
+
+	var friendshipRequests []*entity.FriendshipRequest
+
+	if err := query.Find(&friendshipRequests).Error; err != nil {
+
+		return nil, fmt.Errorf("failed to find friendship requests: %w", err)
+	}
+
+	return friendshipRequests, nil
+}
+
+func (r *FriendshipRepository) FindFriendships(dto *dto.FindFriendshipDTO) ([]*entity.Friendship, error) {
+	query := r.DB
+
+	if dto.UserUUID != uuid.Nil {
+		query = query.Where("user_uuid = ?", dto.UserUUID)
+	}
+
+	if dto.FriendUUID != uuid.Nil {
+		query = query.Where("friend_uuid = ?", dto.FriendUUID)
+	}
+
+	var friendships []*entity.Friendship
+
+	if err := query.Find(&friendships).Error; err != nil {
+
+		return nil, fmt.Errorf("failed to find friendship requests: %w", err)
+	}
+
+	return friendships, nil
 }

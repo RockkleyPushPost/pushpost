@@ -12,7 +12,7 @@ import (
 )
 
 type DI struct {
-	sync.RWMutex
+	mu           sync.RWMutex
 	dependencies map[reflect.Type]interface{}
 	app          *fiber.App
 }
@@ -25,8 +25,8 @@ func NewDI(app *fiber.App) *DI {
 }
 
 func (di *DI) Register(dependencies ...interface{}) error {
-	di.Lock()
-	defer di.Unlock()
+	di.mu.Lock()
+	defer di.mu.Unlock()
 	for _, dependency := range dependencies {
 		if dependency == nil {
 			return errors.New("cannot register nil dependency")
@@ -86,12 +86,10 @@ func (di *DI) RegisterRoutes(routes interface{}, pathPrefix string) error {
 	val := reflect.ValueOf(routes)
 	typ := val.Type()
 
-	// Ensure the input is a struct
 	if val.Kind() != reflect.Struct {
 		return errors.New("routes must be a struct")
 	}
 
-	// Iterate over the struct fields
 	for j := 0; j < val.NumField(); j++ {
 		field := val.Field(j)
 		fieldType := typ.Field(j)

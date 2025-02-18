@@ -58,13 +58,17 @@ func (s *service) validate() error {
 	//	return errors.New("missing container")
 	//}
 	if s.logger == nil {
+
 		return errors.New("missing logger")
 	}
 	if s.config == nil {
+
 		return errors.New("missing config")
 	}
+
 	return nil
 }
+
 func (s *service) Run(ctx context.Context) error {
 	s.logger.Printf("starting %s\n", s.Name())
 

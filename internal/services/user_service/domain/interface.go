@@ -17,7 +17,6 @@ type AuthUseCase interface {
 type UserUseCase interface {
 	GetByUUID(uuid uuid.UUID) (*entity.User, error)
 	GetByEmail(email string) (*entity.User, error)
-	//AddFriend(userUUID uuid.UUID, email string) error
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
 	DeleteFriend(dto *dto.DeleteFriendDTO) error
 }
@@ -29,4 +28,6 @@ type FriendshipUseCase interface {
 	DeleteFriendshipRequest(dto.DeleteFriendshipRequestDto) error
 	AcceptFriendshipRequest(requestUUID uuid.UUID) error
 	DeclineFriendshipRequest(requestUUID uuid.UUID) error
+	FindFriendshipRequest(requestDTO *dto.FindFriendshipRequestDTO) ([]*entity.FriendshipRequest, error)
+	FindFriendships(friendshipDTO *dto.FindFriendshipDTO) ([]*entity.Friendship, error)
 }

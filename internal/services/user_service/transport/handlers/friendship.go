@@ -1,14 +1,15 @@
 package transport
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"pushpost/internal/services/user_service/domain"
 	dto2 "pushpost/internal/services/user_service/domain/dto"
 )
 
 type FriendshipHandler struct {
 	FriendshipUseCase domain.FriendshipUseCase `bind:"friendship_usecase"`
+	UserUseCase       domain.UserUseCase       `bind:"*usecase.UserUseCase"`
 	JwtSecret         string
 }
 
@@ -20,12 +21,11 @@ func (h *FriendshipHandler) CreateFriendshipRequest(c *fiber.Ctx) error {
 	var dto dto2.CreateFriendRequestDto
 
 	if err := c.BodyParser(&dto); err != nil {
-		fmt.Println(err)
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	if err := dto.Validate(); err != nil {
-		fmt.Println(err)
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -33,7 +33,6 @@ func (h *FriendshipHandler) CreateFriendshipRequest(c *fiber.Ctx) error {
 	err := h.FriendshipUseCase.CreateFriendshipRequest(dto)
 
 	if err != nil {
-		fmt.Println(err)
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -154,8 +153,42 @@ func (h *FriendshipHandler) DeclineFriendshipRequest(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "friendship created successfully"})
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "friendship request declined successfully"})
 
+}
+
+func (h *FriendshipHandler) FindIncomingFriendshipRequests(c *fiber.Ctx) error {
+	userUUID := c.Locals("userUUID").(uuid.UUID)
+
+	incomingRequests, err := h.FriendshipUseCase.FindFriendshipRequest(
+		&dto2.FindFriendshipRequestDTO{Status: 0, RecipientUUID: userUUID})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(incomingRequests)
+
+}
+
+func (h *FriendshipHandler) FindFriendshipRequest(c *fiber.Ctx) error {
+	//userUUID := c.Locals("userUUID").(uuid.UUID)
+
+	var dto dto2.FindFriendshipRequestDTO
+
+	if err := c.BodyParser(&dto); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	requests, err := h.FriendshipUseCase.FindFriendshipRequest(&dto)
+
+	if err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+
+	}
+
+	return c.Status(fiber.StatusOK).JSON(requests)
 }
 
 func (h *FriendshipHandler) Handler() {}

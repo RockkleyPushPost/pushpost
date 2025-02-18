@@ -11,7 +11,6 @@ type UserRepository interface {
 	GetUserByEmail(email string) (*entity.User, error)
 	GetUserByUUID(uuid uuid.UUID) (*entity.User, error)
 	GetFriends(userUUID uuid.UUID) ([]entity.User, error)
-	//AddFriend(userUUID uuid.UUID, friendEmail string) error
 	DeleteFriend(dto *dto.DeleteFriendDTO) error
 	Update(user *entity.User) error
 }
@@ -24,4 +23,6 @@ type FriendshipRepository interface {
 	DeleteFriendshipRequest(requestID uuid.UUID) error
 	CreateFriendship(friendship *entity.Friendship) error
 	GetRequestByUUID(requestUUID uuid.UUID) (*entity.FriendshipRequest, error)
+	FindFriendshipRequest(dto *dto.FindFriendshipRequestDTO) ([]*entity.FriendshipRequest, error)
+	FindFriendships(dto *dto.FindFriendshipDTO) ([]*entity.Friendship, error)
 }
