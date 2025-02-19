@@ -47,16 +47,12 @@ func (r *UserRepository) GetUserByUUID(uuid uuid.UUID) (*entity.User, error) {
 func (r *UserRepository) GetFriends(userUUID uuid.UUID) ([]entity.User, error) {
 	var friends []entity.User
 
-	user, err := r.GetUserByUUID(userUUID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = r.DB.
-		Joins("JOIN friendships ON users.uuid = friendships.friend_uuid").
-		Where("friendships.user_uuid = ? AND friendships.deleted_at IS NULL", user.UUID).
-		Or("friendships.friend_uuid = ? AND friendships.deleted_at IS NULL", user.UUID).
-		Where("users.deleted_at IS NULL").
+	err := r.DB.
+		Distinct().
+		Select("users.*").
+		Joins("JOIN friendships ON (users.uuid = friendships.friend_uuid AND friendships.user_uuid = ?) OR (users.uuid = friendships.user_uuid AND friendships.friend_uuid = ?)",
+			userUUID, userUUID).
+		Where("users.deleted_at IS NULL AND friendships.deleted_at IS NULL").
 		Find(&friends).Error
 
 	return friends, err
