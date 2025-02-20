@@ -162,7 +162,9 @@ func (h *FriendshipHandler) FindIncomingFriendshipRequests(c *fiber.Ctx) error {
 
 	incomingRequests, err := h.FriendshipUseCase.FindFriendshipRequest(
 		&dto2.FindFriendshipRequestDTO{Status: 0, RecipientUUID: userUUID})
+
 	if err != nil {
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 

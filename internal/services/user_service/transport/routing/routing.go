@@ -10,7 +10,7 @@ type AuthRoutes struct {
 }
 
 type UserRoutes struct {
-	GetUserByUUID fiber.Handler `method:"GET" secure:"true"`
+	GetUserByUUID fiber.Handler `method:"POST" secure:"true"`
 	GetFriends    fiber.Handler `method:"GET" secure:"true"`
 	AddFriend     fiber.Handler `method:"POST" secure:"true"`
 	DeleteFriend  fiber.Handler `method:"DELETE" secure:"true"`
