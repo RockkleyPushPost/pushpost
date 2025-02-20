@@ -1,7 +1,7 @@
 <h1>PUSHPOST</h1>
 <i>Singlepage social network without odd functionality</i>
 
-STAGE: early development 
+STAGE: MVP development 
 
 >Technology stack:
 
@@ -9,7 +9,8 @@ STAGE: early development
 * Fiber
 * Postgresql
 * Docker
-* Goose
 * Redis
+* WebSocket
+* Goose
 
   
