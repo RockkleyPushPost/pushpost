@@ -7,39 +7,50 @@ import (
 	"os/signal"
 	"pushpost/internal/config"
 	"pushpost/internal/services/user_service/service"
+	"pushpost/internal/setup"
+	"pushpost/pkg/di"
 	"syscall"
 )
 
 func main() {
-	//ctx, cancel := context.WithCancel(context.Background())
-	//defer cancel()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	logger := initLogger()
 
 	cfg, err := config.LoadYamlConfig("configs/development.yaml")
 
 	if err != nil {
+
 		logger.Fatal(err)
 	}
 
-	_, err = service.Setup(cfg)
+	server := setup.NewFiber()
+
+	DI := di.NewDI(server, cfg.JwtSecret)
+
+	err = service.Setup(DI, server, cfg)
 
 	if err != nil {
+
 		logger.Fatal(err)
 	}
 
-	//srv, err := service.NewService(
-	//	service.WithConfig(cfg),
-	//	service.WithDI(di),
-	//	service.WithLogger(logger),
-	//)
-	//if err != nil {
-	//	logger.Fatal(err)
-	//}
-	//
-	//go handleShutdown(ctx, cancel, srv, logger)
-	//
-	//logger.Fatal(srv.Run(ctx))
+	srv, err := service.NewService(
+		service.WithConfig(cfg),
+		service.WithDI(DI),
+		service.WithLogger(logger),
+		service.WithServer(server),
+	)
+
+	if err != nil {
+
+		logger.Fatal(err)
+	}
+
+	go handleShutdown(ctx, cancel, srv, logger)
+
+	logger.Fatal(srv.Run(ctx))
 
 }
 

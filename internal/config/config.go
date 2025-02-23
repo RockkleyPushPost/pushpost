@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	Database *database.Config `json:"database" yaml:"database"`
-	Server   *ServerConfig    `json:"fiber" yaml:"fiber"`
+	Database  *database.Config `json:"database" yaml:"database"`
+	Server    *ServerConfig    `json:"fiber" yaml:"fiber"`
+	JwtSecret string           `json:"jwt_secret" yaml:"jwt_secret"`
 }
 
 type ServerConfig struct {
-	Host string `json:"host" yaml:"host" env:"HOST"`
-	User string `json:"user" yaml:"user" env:"USER"`
+	Host string `json:"host" yaml:"host"`
+	Port string `json:"port" yaml:"port"`
 }
 
 func LoadYamlConfig(path string) (*Config, error) {
@@ -37,8 +38,8 @@ func (c *ServerConfig) Validate() error {
 	if c.Host == "" {
 		return errors.New("missing host")
 	}
-	if c.User == "" {
-		return errors.New("missing user")
+	if c.Port == "" {
+		return errors.New("missing port")
 	}
 	return nil
 }

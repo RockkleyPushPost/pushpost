@@ -15,11 +15,14 @@ type DI struct {
 	mu           sync.RWMutex
 	dependencies map[reflect.Type]interface{}
 	app          *fiber.App
+	jwtSecret    string
 }
 
-func NewDI(app *fiber.App) *DI {
+func NewDI(app *fiber.App, jwtSecret string) *DI {
+
 	return &DI{
 		dependencies: make(map[reflect.Type]interface{}),
+		jwtSecret:    jwtSecret,
 		app:          app,
 	}
 }
@@ -29,12 +32,14 @@ func (di *DI) Register(dependencies ...interface{}) error {
 	defer di.mu.Unlock()
 	for _, dependency := range dependencies {
 		if dependency == nil {
+
 			return errors.New("cannot register nil dependency")
 		}
 		t := reflect.TypeOf(dependency)
 		di.dependencies[t] = dependency
 		log.Printf("Registered dependency type: %v", t)
 	}
+
 	return nil
 }
 
@@ -44,6 +49,7 @@ func (di *DI) Bind(targets ...interface{}) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -53,21 +59,26 @@ func (di *DI) bindTarget(target interface{}) error {
 
 	for i := 0; i < val.NumField(); i++ {
 		if err := di.bindField(val.Field(i), typ.Field(i)); err != nil {
+
 			return err
 		}
 	}
+
 	return nil
 }
 
 func (di *DI) bindField(field reflect.Value, fieldType reflect.StructField) error {
 	tag, ok := fieldType.Tag.Lookup("bind")
+
 	if !ok {
+
 		return nil
 	}
 
 	if dep, exists := di.dependencies[field.Type()]; exists {
 		field.Set(reflect.ValueOf(dep))
 		log.Printf("Bound dependency using tag: %s", tag)
+
 		return nil
 	}
 
@@ -75,6 +86,7 @@ func (di *DI) bindField(field reflect.Value, fieldType reflect.StructField) erro
 		if field.Type().Kind() == reflect.Interface && depType.Implements(field.Type()) {
 			field.Set(reflect.ValueOf(dep))
 			log.Printf("Bound interface dependency using tag: %s", tag)
+
 			return nil
 		}
 	}
@@ -87,6 +99,7 @@ func (di *DI) RegisterRoutes(routes interface{}, pathPrefix string) error {
 	typ := val.Type()
 
 	if val.Kind() != reflect.Struct {
+
 		return errors.New("routes must be a struct")
 	}
 
@@ -104,7 +117,7 @@ func (di *DI) RegisterRoutes(routes interface{}, pathPrefix string) error {
 
 			var handlers []fiber.Handler
 			if hasSecure && secure == "true" {
-				handlers = append(handlers, middleware.AuthJWTMiddleware("bullsonparade"))
+				handlers = append(handlers, middleware.AuthJWTMiddleware(di.jwtSecret))
 			}
 			handlers = append(handlers, handler)
 
@@ -141,7 +154,9 @@ func parseRouteTag(tag string) (string, string) {
 	// Example tag: "GET /users"
 	parts := strings.Split(tag, " ")
 	if len(parts) != 2 {
+
 		return "", ""
 	}
+
 	return parts[0], parts[1]
 }

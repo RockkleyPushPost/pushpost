@@ -1,10 +1,12 @@
 package service
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"log"
 	"pushpost/internal/config"
 	"pushpost/internal/services/user_service/domain"
 	"pushpost/internal/services/user_service/domain/usecase"
+	"pushpost/internal/services/user_service/entity"
 	"pushpost/internal/services/user_service/storage"
 	"pushpost/internal/services/user_service/storage/repository"
 	transport2 "pushpost/internal/services/user_service/transport"
@@ -14,16 +16,18 @@ import (
 	"pushpost/pkg/di"
 )
 
-func Setup(cfg *config.Config) (*di.DI, error) {
+func Setup(DI *di.DI, server *fiber.App, cfg *config.Config) error {
 
-	jwtSecret := "bullsonparade"
+	jwtSecret := cfg.JwtSecret
 
-	app := setup.NewFiber()
 	db, err := setup.Database(cfg.Database)
+	db.AutoMigrate(&entity.User{})
+	db.AutoMigrate(&entity.Friendship{})
+	db.AutoMigrate(&entity.FriendshipRequest{})
 	if err != nil {
-		return nil, err
+
+		return err
 	}
-	DI := di.NewDI(app)
 
 	// Auth
 	var authUseCase domain.AuthUseCase = &usecase.AuthUseCase{JwtSecret: jwtSecret}
@@ -31,7 +35,7 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 
 	// User
 	var userRepository storage.UserRepository = &repository.UserRepository{}
-	var userUseCase domain.UserUseCase = &usecase.UserUseCase{}
+	var userUseCase domain.UserUseCase = &usecase.UserUseCase{JwtSecret: jwtSecret}
 	var userHandler transport2.UserHandler = &transport.UserHandler{}
 
 	// Friendship
@@ -40,16 +44,18 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
 
 	if err = DI.Register(
-		app, db, userRepository, userUseCase, userHandler, userHandler,
+		server, db, userRepository, userUseCase, userHandler, userHandler,
 		friendshipRepository, friendshipUseCase, friendshipHandler, authUseCase, authHandler); err != nil {
 		log.Fatalf("failed to register %v", err)
-		return nil, err
+
+		return err
 	}
 
-	if err = DI.Bind(app, db, userRepository, userUseCase, userHandler, userHandler,
+	if err = DI.Bind(server, db, userRepository, userUseCase, userHandler, userHandler,
 		friendshipRepository, friendshipUseCase, friendshipHandler, authUseCase, authHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
-		return nil, err
+
+		return err
 	}
 
 	authRoutes := routing.AuthRoutes{
@@ -78,21 +84,24 @@ func Setup(cfg *config.Config) (*di.DI, error) {
 
 	if err = DI.RegisterRoutes(authRoutes, "/auth"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
-		return nil, err
+
+		return err
 	}
 	if err = DI.RegisterRoutes(userRoutes, "/user"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
-		return nil, err
+
+		return err
 	}
 	if err = DI.RegisterRoutes(friendshipRoutes, "/friendship"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
-		return nil, err
+
+		return err
 	}
 	//db.AutoMigrate(&entity.User{})
-	log.Println("Server started on :8080")
-	if err := app.Listen(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	//log.Println("Server started on :8080")
+	//if err := server.Listen(":8080"); err != nil {
+	//	log.Fatalf("Failed to start server: %v", err)
+	//}
 
-	return DI, nil
+	return nil
 }
