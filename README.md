@@ -10,6 +10,7 @@ STAGE: MVP development
 * Postgresql
 * Docker
 * Redis
+* RabbitMQ
 * WebSocket
 * Goose
 
