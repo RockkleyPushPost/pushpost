@@ -2,32 +2,22 @@ package service
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 	"log"
 	"pushpost/internal/config"
 	"pushpost/internal/services/user_service/domain"
 	"pushpost/internal/services/user_service/domain/usecase"
-	"pushpost/internal/services/user_service/entity"
 	"pushpost/internal/services/user_service/storage"
 	"pushpost/internal/services/user_service/storage/repository"
 	transport2 "pushpost/internal/services/user_service/transport"
 	"pushpost/internal/services/user_service/transport/handlers"
 	"pushpost/internal/services/user_service/transport/routing"
-	"pushpost/internal/setup"
 	"pushpost/pkg/di"
 )
 
-func Setup(DI *di.DI, server *fiber.App, cfg *config.Config) error {
+func Setup(DI *di.DI, server *fiber.App, db *gorm.DB, cfg *config.Config) error {
 
 	jwtSecret := cfg.JwtSecret
-
-	db, err := setup.Database(cfg.Database)
-	db.AutoMigrate(&entity.User{})
-	db.AutoMigrate(&entity.Friendship{})
-	db.AutoMigrate(&entity.FriendshipRequest{})
-	if err != nil {
-
-		return err
-	}
 
 	// Auth
 	var authUseCase domain.AuthUseCase = &usecase.AuthUseCase{JwtSecret: jwtSecret}
@@ -43,7 +33,7 @@ func Setup(DI *di.DI, server *fiber.App, cfg *config.Config) error {
 	var friendshipUseCase domain.FriendshipUseCase = &usecase.FriendshipUseCase{JwtSecret: jwtSecret}
 	var friendshipHandler transport2.FriendshipHandler = &transport.FriendshipHandler{}
 
-	if err = DI.Register(
+	if err := DI.Register(
 		server, db, userRepository, userUseCase, userHandler, userHandler,
 		friendshipRepository, friendshipUseCase, friendshipHandler, authUseCase, authHandler); err != nil {
 		log.Fatalf("failed to register %v", err)
@@ -51,7 +41,7 @@ func Setup(DI *di.DI, server *fiber.App, cfg *config.Config) error {
 		return err
 	}
 
-	if err = DI.Bind(server, db, userRepository, userUseCase, userHandler, userHandler,
+	if err := DI.Bind(server, db, userRepository, userUseCase, userHandler, userHandler,
 		friendshipRepository, friendshipUseCase, friendshipHandler, authUseCase, authHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
 
@@ -82,26 +72,23 @@ func Setup(DI *di.DI, server *fiber.App, cfg *config.Config) error {
 		FindIncomingFriendshipRequests:       friendshipHandler.FindIncomingFriendshipRequests,
 	}
 
-	if err = DI.RegisterRoutes(authRoutes, "/auth"); err != nil {
+	if err := DI.RegisterRoutes(authRoutes, "/auth"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
 
 		return err
 	}
-	if err = DI.RegisterRoutes(userRoutes, "/user"); err != nil {
+
+	if err := DI.RegisterRoutes(userRoutes, "/user"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
 
 		return err
 	}
-	if err = DI.RegisterRoutes(friendshipRoutes, "/friendship"); err != nil {
+
+	if err := DI.RegisterRoutes(friendshipRoutes, "/friendship"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
 
 		return err
 	}
-	//db.AutoMigrate(&entity.User{})
-	//log.Println("Server started on :8080")
-	//if err := server.Listen(":8080"); err != nil {
-	//	log.Fatalf("Failed to start server: %v", err)
-	//}
 
 	return nil
 }

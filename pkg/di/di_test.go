@@ -166,7 +166,7 @@ func TestDI_Register(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			di := NewDI(&fiber.App{})
+			di := NewDI(&fiber.App{}, "")
 			t.Cleanup(func() {
 				di.dependencies = nil
 			})
@@ -193,7 +193,7 @@ func TestDI_Register(t *testing.T) {
 }
 
 func BenchmarkDI_Register(b *testing.B) {
-	di := NewDI(&fiber.App{})
+	di := NewDI(&fiber.App{}, "")
 	deps := generateManyDependencies(10)
 
 	b.ResetTimer()
@@ -202,7 +202,7 @@ func BenchmarkDI_Register(b *testing.B) {
 	}
 }
 func ExampleDI_Register() {
-	di := NewDI(&fiber.App{})
+	di := NewDI(&fiber.App{}, "")
 	err := di.Register("example", 42)
 	if err != nil {
 		fmt.Println(err)
