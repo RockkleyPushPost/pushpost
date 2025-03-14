@@ -8,9 +8,11 @@ STAGE: MVP development
 * Golang 
 * Fiber
 * Postgresql
+* Prometheus
 * Docker
 * Redis
 * RabbitMQ
+* Grafana
 * WebSocket
 * Goose
 
