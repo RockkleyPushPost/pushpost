@@ -1,17 +1,17 @@
 database:
-  host: "localhost"
-  port: 5438
+  host: "postgres"
+  port: 5432
   user: "postgres"
-  password: "12345"
-  db_name: "postgres"
-  schema: "public"
+  password: "pushword"
+  db_name: "pushpost"
+  schema: "pushpost"
 
 server:
-  address: "localhost"
+  address: "0.0.0.0"
 
 fiber:
   app_name: "PushPost"
-  host: "localhost"
+  host: "0.0.0.0"
   port: 8080
 
 

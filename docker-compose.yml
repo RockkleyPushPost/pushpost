@@ -1,0 +1,62 @@
+
+services:
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: pushpost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pushword
+    ports:
+      - "5432:5432"
+    networks:
+      - monitoring
+
+  user_service:
+    build:
+      context: .
+      dockerfile: internal/services/user_service/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+        - ./configs:/configs  # 🔥 Mount local config directory inside container
+    environment:
+      - CONFIG_PATH=/configs/development.yaml
+#      - DB_HOST=db
+#      - DB_PORT=5432
+#      - DB_USER=postgres
+#      - DB_PASSWORD=secret
+#      - DB_NAME=mydb
+    networks:
+      - monitoring
+
+    restart: always
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+
+volumes:
+  grafana-data:
+

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ansrivas/fiberprometheus/v2"
 	"log"
 	"os"
 	"os/signal"
@@ -21,7 +22,7 @@ func main() {
 	defer cancel()
 
 	logger := lg.InitLogger(ServiceName)
-	cfg, err := config.LoadYamlConfig("configs/development.yaml")
+	cfg, err := config.LoadYamlConfig(os.Getenv("CONFIG_PATH"))
 
 	if err != nil {
 
@@ -29,6 +30,11 @@ func main() {
 	}
 
 	server := setup.NewFiber()
+
+	// PROMETHEUS
+	fiberPrometheus := fiberprometheus.New(ServiceName)
+	fiberPrometheus.RegisterAt(server, "/metrics")
+	server.Use(fiberPrometheus.Middleware)
 
 	db, err := setup.Database(cfg.Database)
 
