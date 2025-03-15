@@ -1,17 +1,6 @@
 
 services:
 
-  postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: pushpost
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pushword
-    ports:
-      - "5432:5432"
-    networks:
-      - monitoring
-
   user_service:
     build:
       context: .
@@ -19,7 +8,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-        - ./configs:/configs  # 🔥 Mount local config directory inside container
+        - ./configs:/configs
     environment:
       - CONFIG_PATH=/configs/development.yaml
 #      - DB_HOST=db
@@ -31,6 +20,18 @@ services:
       - monitoring
 
     restart: always
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: pushpost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pushword
+    ports:
+      - "5432:5432"
+    networks:
+      - monitoring
+
   prometheus:
     image: prom/prometheus:latest
     ports:
