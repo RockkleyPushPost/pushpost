@@ -1,1 +1,0 @@
-docker run --name pushpost -e POSTGRES_USER=pushpost -e POSTGRES_PASSWORD=pushword -e POSTGRES_DB=pushpost -p 5432:5432 -d postgres
