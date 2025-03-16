@@ -3,8 +3,8 @@ database:
   port: 5432
   user: "postgres"
   password: "pushword"
-  db_name: "pushpost"
-  schema: "pushpost"
+  db_name: "pushpost_user"
+  schema: "public"
 
 server:
   address: "0.0.0.0"

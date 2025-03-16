@@ -9,7 +9,7 @@ import (
 	"pushpost/pkg/di"
 )
 
-const serviceName string = "NotificationService"
+const serviceName string = "PostService"
 
 type Option func(*service)
 

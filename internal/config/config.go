@@ -22,24 +22,34 @@ func LoadYamlConfig(path string) (*Config, error) {
 	config := Config{}
 
 	file, err := os.Open(path)
+
 	if err != nil {
+
 		return nil, err
 	}
+
 	defer file.Close()
 
 	decoder := yaml.NewDecoder(file)
+
 	if err := decoder.Decode(&config); err != nil {
+
 		return nil, err
 	}
+
 	return &config, nil
 }
 
 func (c *ServerConfig) Validate() error {
 	if c.Host == "" {
+
 		return errors.New("missing host")
 	}
+
 	if c.Port == "" {
+
 		return errors.New("missing port")
 	}
+
 	return nil
 }

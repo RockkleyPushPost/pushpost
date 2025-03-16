@@ -20,6 +20,7 @@ func (c *Container) Register(service interface{}) {
 
 		panic("register: nil service")
 	}
+
 	c.services.Store(service, service)
 }
 

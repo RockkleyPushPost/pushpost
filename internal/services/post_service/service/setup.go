@@ -4,41 +4,41 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"log"
-	"pushpost/internal/services/notification_service/domain"
-	"pushpost/internal/services/notification_service/domain/usecase"
-	"pushpost/internal/services/notification_service/storage"
-	"pushpost/internal/services/notification_service/storage/repository"
-	transport2 "pushpost/internal/services/notification_service/transport"
-	transport "pushpost/internal/services/notification_service/transport/handlers"
-	"pushpost/internal/services/notification_service/transport/routing"
+	"pushpost/internal/services/post_service/domain"
+	"pushpost/internal/services/post_service/domain/usecase"
+	"pushpost/internal/services/post_service/storage"
+	"pushpost/internal/services/post_service/storage/repository"
+	transport2 "pushpost/internal/services/post_service/transport"
+	transport "pushpost/internal/services/post_service/transport/handlers"
+	"pushpost/internal/services/post_service/transport/routing"
 	"pushpost/pkg/di"
 )
 
 func Setup(DI *di.DI, server *fiber.App, db *gorm.DB) error {
 
-	// Notification
-	var notificationUseCase domain.NotificationUseCase = &usecase.NotificationUseCase{}
-	var notificationRepository storage.NotificationRepository = &repository.NotificationRepository{}
-	var notificationHandler transport2.NotificationHandler = &transport.NotificationHandler{}
+	// Post
+	var postUseCase domain.PostUseCase = &usecase.PostUseCase{}
+	var postRepository storage.PostRepository = &repository.PostRepository{}
+	var postHandler transport2.PostHandler = &transport.PostHandler{}
 
 	if err := DI.Register(
-		server, db, notificationRepository, notificationUseCase, notificationHandler); err != nil {
+		server, db, postRepository, postUseCase, postHandler); err != nil {
 		log.Fatalf("failed to register %v", err)
 
 		return err
 	}
 
-	if err := DI.Bind(server, db, notificationRepository, notificationUseCase, notificationHandler); err != nil {
+	if err := DI.Bind(server, db, postRepository, postUseCase, postHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
 
 		return err
 	}
 
-	notificationRoutes := routing.NotificationRoutes{
-		Create: notificationHandler.CreateNotification,
+	postRoutes := routing.PostRoutes{
+		Create: postHandler.CreatePost,
 	}
 
-	if err := DI.RegisterRoutes(notificationRoutes, "/notification"); err != nil {
+	if err := DI.RegisterRoutes(postRoutes, "/post"); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
 
 		return err

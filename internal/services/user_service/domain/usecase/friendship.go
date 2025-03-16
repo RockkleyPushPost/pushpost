@@ -61,6 +61,10 @@ func (uc *FriendshipUseCase) CreateFriendshipRequest(prop dto.CreateFriendReques
 		return errors.New("friend request already exists")
 	}
 
+	if uuid.MustParse(senderUUID) == recipient.UUID {
+		return errors.New("you can't send a friend request to yourself")
+	}
+
 	request := entity.NewFriendshipRequest(uuid.MustParse(senderUUID), recipient.UUID)
 
 	return uc.FriendshipRepo.CreateFriendshipRequest(*request)
