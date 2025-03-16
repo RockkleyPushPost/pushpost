@@ -38,7 +38,7 @@ func main() {
 
 	DI := di.NewDI(server, cfg.JwtSecret)
 
-	err = service.Setup(DI, server, db, cfg)
+	err = service.Setup(DI, server, db)
 
 	if err != nil {
 
