@@ -6,14 +6,14 @@ import (
 	"os"
 	"os/signal"
 	"pushpost/internal/config"
-	"pushpost/internal/services/notification_service/service"
+	"pushpost/internal/services/post_service/service"
 	"pushpost/internal/setup"
 	"pushpost/pkg/di"
 	lg "pushpost/pkg/logger"
 	"syscall"
 )
 
-const ServiceName = "notification-service"
+const ServiceName = "post-service"
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
