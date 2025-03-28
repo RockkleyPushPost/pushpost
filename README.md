@@ -10,6 +10,7 @@ STAGE: MVP development
 * PostgreSQL
 * Prometheus 
 * Docker
+* Apache Kafka
 * Redis
 * RabbitMQ
 * Grafana
