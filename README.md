@@ -1,20 +1,26 @@
 <h1>PUSHPOST</h1>
-<i>Singlepage social network without odd functionality</i>
 
-STAGE: MVP development 
+<i>Pushpost is a lightweight social network without odd functionality. The project is currently in the MVP (Minimum Viable Product) stage.</i>
 
->Technology stack:
+<h3>Technology stack</h3>
 
-* Golang 
-* Fiber
-* PostgreSQL
-* Prometheus 
-* Docker
-* Apache Kafka
-* Redis
-* RabbitMQ
-* Grafana
-* WebSocket
-* Goose
+* Programming Language: Go
+* Web Framework: Fiber
+* Database: PostgreSQL
+* Caching: Redis
+* Message Brokers: Apache Kafka, RabbitMQ
+* Monitoring: Prometheus, Grafana
+* Real-Time Protocol: WebSocket
+* Database Migrations: Goose
+* Containerization: Docker
 
   
+<h3>Features</h3>
+
+* User registration and authentication
+* Messaging with other users
+* Follow/unfollow users (friends)
+* Post publishing
+* Real-time posts feed
+* Notifications
+* Creating withlists
