@@ -1,26 +1,6 @@
 
 services:
 
-  user_service:
-    build:
-      context: .
-      dockerfile: internal/services/user_service/Dockerfile
-    ports:
-      - "8080:8080"
-    volumes:
-        - ./configs:/configs
-    environment:
-      - USER_CONFIG=/configs/user_service.yaml
-#      - DB_HOST=db
-#      - DB_PORT=5432
-#      - DB_USER=postgres
-#      - DB_PASSWORD=secret
-#      - DB_NAME=mydb
-    networks:
-      - monitoring
-
-    restart: always
-
   postgres:
     image: postgres:latest
     environment:
@@ -29,6 +9,8 @@ services:
       POSTGRES_PASSWORD: pushword
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
       - monitoring
 
@@ -55,9 +37,83 @@ services:
     networks:
       - monitoring
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - monitoring
+      - kafka-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    networks:
+      - kafka-network
+
+  user_service:
+    build:
+      context: .
+      dockerfile: internal/services/user_service/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs:/configs
+    environment:
+      - USER_CONFIG=/configs/user_service.yaml
+    #      - DB_HOST=db
+    #      - DB_PORT=5432
+    #      - DB_USER=postgres
+    #      - DB_PASSWORD=secret
+    #      - DB_NAME=mydb
+    networks:
+      - monitoring
+
+    restart: always
+
+  auth_service:
+    build:
+      context: .
+      dockerfile: internal/services/auth_service/Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./configs:/configs
+    environment:
+      KAFKA_BROKER: "kafka:9092"
+    #    environment:
+    #        - USER_CONFIG=/configs/user_service.yaml
+    #      #      - DB_HOST=db
+    #      #      - DB_PORT=5432
+    #      #      - DB_USER=postgres
+    #      #      - DB_PASSWORD=secret
+    #      #      - DB_NAME=mydb
+    networks:
+      - monitoring
+      - kafka-network
+
+    restart: always
+
 networks:
   monitoring:
+  kafka-network:
 
 volumes:
+  pgdata:
+  prometheus:
   grafana-data:
+  zookeeper-data:
+  zookeeper-logs:
+  kafka-data:
 

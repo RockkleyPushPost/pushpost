@@ -60,8 +60,6 @@ func AuthJWTMiddleware(secret string) fiber.Handler {
 			})
 		}
 
-		//log.Printf("User UUID from token: %s", userUUID)
-
 		c.Locals("userUUID", userUUID)
 
 		return c.Next()

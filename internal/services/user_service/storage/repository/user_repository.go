@@ -67,6 +67,7 @@ func (r *UserRepository) DeleteFriend(dto *dto.DeleteFriendDTO) error {
 
 		return err
 	}
+
 	friend, err := r.GetUserByEmail(dto.FriendEmail)
 
 	if err != nil {

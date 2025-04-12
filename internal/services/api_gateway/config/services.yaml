@@ -1,0 +1,43 @@
+services:
+  - name: user
+    base_url: ${USER_SERVICE_URL}
+    prefix: /api/users
+    health_check:
+      path: /health
+      interval: 30s
+      timeout: 5s
+      success_threshold: 2
+      failure_threshold: 3
+    timeout: 10s
+    retry:
+      attempts: 3
+      delay: 1s
+
+  - name: notification
+    base_url: ${NOTIFICATION_SERVICE_URL}
+    prefix: /api/notifications
+    health_check:
+      path: /api/health
+      interval: 30s
+      timeout: 5s
+      success_threshold: 2
+      failure_threshold: 3
+    timeout: 10s
+    retry:
+      attempts: 3
+      delay: 1s
+
+  - name: post
+    base_url: ${POST_SERVICE_URL}
+    prefix: /api/posts
+    health_check:
+      path: /api/health
+      interval: 30s
+      timeout: 5s
+      success_threshold: 2
+      failure_threshold: 3
+    timeout: 10s
+    retry:
+      attempts: 3
+      delay: 1s
+
