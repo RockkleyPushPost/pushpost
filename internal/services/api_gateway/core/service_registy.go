@@ -84,14 +84,14 @@ func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 	if err != nil {
 
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
-			"error": "Service unavailable",
+			"error": "service unavailable",
 			"path":  c.Path(),
 		})
 	}
 
 	if service.Config.HealthCheck != nil && !service.IsHealthy() {
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
-			"error":   "Service unavailable",
+			"error":   "service unavailable",
 			"service": service.Name,
 		})
 	}
@@ -128,7 +128,12 @@ func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 			"details": lastErr.Error(),
 		})
 	}
-	defer resp.Body.Close()
+
+	if resp == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "received nil response from service",
+		})
+	}
 
 	for key, values := range resp.Header {
 		for _, value := range values {
