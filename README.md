@@ -23,4 +23,4 @@
 * Post publishing
 * Real-time posts feed
 * Notifications
-* Creating withlists
+* Creating wishlists
