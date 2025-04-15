@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	conf, err := config.LoadYamlConfig("configs/user_service.yaml")
+	conf, err := config.LoadYamlConfig("configs/gateway_service.yaml")
 
 	if err != nil {
 

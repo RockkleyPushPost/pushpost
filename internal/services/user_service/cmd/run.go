@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"github.com/ansrivas/fiberprometheus/v2"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"
 	"os"
 	"os/signal"
@@ -29,7 +31,7 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	server := setup.NewFiber()
+	server := setup.NewFiber(fiber.Config{}, cors.Config{})
 
 	// PROMETHEUS
 	fiberPrometheus := fiberprometheus.New(ServiceName)

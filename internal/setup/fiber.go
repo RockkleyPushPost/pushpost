@@ -5,9 +5,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
-func NewFiber() *fiber.App {
-	app := fiber.New()
-	app.Use(cors.New())
+func NewFiber(config fiber.Config, corsConfig cors.Config) *fiber.App {
+	app := fiber.New(config)
+	app.Use(cors.New(corsConfig))
 
 	return app
 }

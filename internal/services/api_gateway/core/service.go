@@ -2,6 +2,8 @@ package core
 
 import (
 	"context"
+	"github.com/gofiber/fiber/v2"
+	"log"
 	"net/http"
 	"pushpost/internal/services/api_gateway/config"
 	"sync"
@@ -17,31 +19,30 @@ type ServiceStatus struct {
 	ConsecutiveSuccess int
 }
 type Service struct {
-	Name    string
-	BaseURL string
-	Prefix  string
-	Client  *Client
-	Config  *config.ServiceConfig
-	Status  ServiceStatus
-	mu      sync.RWMutex
+	Client *Client
+	config *config.ServiceConfig
+	server *fiber.App
+	logger *log.Logger
+	Status ServiceStatus
+	mu     sync.RWMutex
 }
 
 func (s *Service) CheckHealth() {
-	if s.Config.HealthCheck == nil {
+	if s.config.HealthCheck == nil {
 		return
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	ctx, cancel := context.WithTimeout(context.Background(), s.Config.HealthCheck.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), s.config.HealthCheck.Timeout)
 	defer cancel()
 
 	healthReqOpts := RequestOptions{
 		Method:  "GET",
-		Path:    s.Config.HealthCheck.Path,
+		Path:    s.config.HealthCheck.Path,
 		Body:    nil,
 		Headers: make(http.Header),
-		Timeout: s.Config.HealthCheck.Timeout,
+		Timeout: s.config.HealthCheck.Timeout,
 	}
 
 	resp, err := s.Client.ForwardRequest(ctx, healthReqOpts)
@@ -55,7 +56,7 @@ func (s *Service) CheckHealth() {
 		s.Status.ConsecutiveSuccess = 0
 
 		// check and mark if unhealthy
-		if s.Status.ConsecutiveErrors >= s.Config.HealthCheck.FailureThreshold {
+		if s.Status.ConsecutiveErrors >= s.config.HealthCheck.FailureThreshold {
 			s.Status.Healthy = false
 		}
 		return
@@ -67,4 +68,9 @@ func (s *Service) IsHealthy() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.Status.Healthy
+}
+func (s *Service) GetStatus() ServiceStatus {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.Status
 }

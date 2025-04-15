@@ -37,6 +37,12 @@ func LoadYamlConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
+	if &config == nil {
+
+		return nil, errors.New("loaded services config is nil")
+
+	}
+
 	return &config, nil
 }
 

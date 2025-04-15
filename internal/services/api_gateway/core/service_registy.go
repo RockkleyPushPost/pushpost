@@ -13,23 +13,18 @@ import (
 
 type ServiceRegistry struct {
 	services map[string]*Service
-	config   *config.GatewayConfig
 	mu       sync.RWMutex
 }
 
-func NewServiceRegistry(cfg *config.GatewayConfig) *ServiceRegistry {
+func NewServiceRegistry(serviceConfigs []config.ServiceConfig) *ServiceRegistry {
 	registry := &ServiceRegistry{
 		services: make(map[string]*Service),
-		config:   cfg,
 	}
 
-	for _, serviceConfig := range cfg.Services {
+	for _, serviceConfig := range serviceConfigs {
 		service := &Service{
-			Name:    serviceConfig.Name,
-			BaseURL: serviceConfig.BaseURL,
-			Prefix:  serviceConfig.Prefix,
-			Client:  NewClient(serviceConfig.BaseURL, serviceConfig.Timeout),
-			Config:  &serviceConfig,
+			Client: NewClient(serviceConfig.BaseURL, serviceConfig.Timeout),
+			config: &serviceConfig,
 			Status: ServiceStatus{
 				Healthy:   true,
 				LastCheck: time.Now(),
@@ -56,7 +51,7 @@ func (sr *ServiceRegistry) GetServiceByPath(path string) (*Service, error) {
 	defer sr.mu.RUnlock()
 
 	for _, service := range sr.services {
-		if strings.HasPrefix(path, service.Prefix) {
+		if strings.HasPrefix(path, service.config.Prefix) {
 
 			return service, nil
 		}
@@ -66,10 +61,10 @@ func (sr *ServiceRegistry) GetServiceByPath(path string) (*Service, error) {
 }
 
 func (sr *ServiceRegistry) startHealthCheck(s *Service) {
-	if s.Config.HealthCheck == nil {
+	if s.config.HealthCheck == nil {
 		return
 	}
-	ticker := time.NewTicker(s.Config.HealthCheck.Interval)
+	ticker := time.NewTicker(s.config.HealthCheck.Interval)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -89,21 +84,21 @@ func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 		})
 	}
 
-	if service.Config.HealthCheck != nil && !service.IsHealthy() {
+	if service.config.HealthCheck != nil && !service.IsHealthy() {
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 			"error":   "service unavailable",
-			"service": service.Name,
+			"service": service.config.Name,
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), service.Config.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), service.config.Timeout)
 	defer cancel()
 
 	ctx = context.WithValue(ctx, "trace_id", c.Get("X-Trace-ID"))
 
 	opts := RequestOptions{
 		Method:  c.Method(),
-		Path:    strings.TrimPrefix(c.Path(), service.Prefix),
+		Path:    strings.TrimPrefix(c.Path(), service.config.Prefix),
 		Body:    c.Request().BodyStream(),
 		Headers: c.GetReqHeaders(),
 	}
@@ -111,20 +106,20 @@ func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 	var resp *http.Response
 	var lastErr error
 
-	for i := 0; i < service.Config.Retry.Attempts; i++ {
+	for i := 0; i < service.config.Retry.Attempts; i++ {
 		resp, lastErr = service.Client.ForwardRequest(ctx, opts)
 
 		if lastErr == nil {
 			break
 		}
 
-		time.Sleep(service.Config.Retry.Delay)
+		time.Sleep(service.config.Retry.Delay)
 	}
 
 	if lastErr != nil {
 
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error":   fmt.Sprintf("failed to forward request to %s", service.Name),
+			"error":   fmt.Sprintf("failed to forward request to %s", service.config.Name),
 			"details": lastErr.Error(),
 		})
 	}

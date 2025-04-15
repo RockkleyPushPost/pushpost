@@ -1,6 +1,11 @@
 package config
 
-import "time"
+import (
+	"fmt"
+	"gopkg.in/yaml.v3"
+	"os"
+	"time"
+)
 
 type HealthcheckConfig struct {
 	Path             string        `yaml:"path"`
@@ -14,7 +19,7 @@ type ServiceConfig struct {
 	Name        string             `yaml:"name"`
 	BaseURL     string             `yaml:"baseURL"`
 	Prefix      string             `yaml:"prefix"`
-	HealthCheck *HealthcheckConfig `yaml:"health_check, omitempty"`
+	HealthCheck *HealthcheckConfig `yaml:"health_check,omitempty"`
 	Timeout     time.Duration      `yaml:"timeout"`
 	Retry       RetryConfig        `yaml:"retry"`
 }
@@ -27,4 +32,34 @@ type RetryConfig struct {
 type GatewayConfig struct {
 	Services []ServiceConfig `yaml:"services"`
 	Port     string          `yaml:"port"`
+}
+
+func LoadServicesConfig(path string) ([]ServiceConfig, error) {
+	servicesCfg, err := os.Open(path)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	defer servicesCfg.Close()
+
+	type Config struct {
+		Services []ServiceConfig `yaml:"services"`
+	}
+
+	var config Config
+
+	decoder := yaml.NewDecoder(servicesCfg)
+	if err := decoder.Decode(&config); err != nil {
+
+		return nil, fmt.Errorf("failed to decode yaml: %w", err)
+	}
+
+	if len(config.Services) == 0 {
+
+		return nil, fmt.Errorf("no services found in configuration")
+	}
+
+	return config.Services, nil
 }

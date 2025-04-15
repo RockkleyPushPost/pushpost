@@ -10,8 +10,7 @@ server:
   address: "0.0.0.0"
 
 fiber:
-  app_name: "PushPost"
-  host: "0.0.0.0"
+  app_name: "PushPost User-Service"
   port: 8080
 
 
