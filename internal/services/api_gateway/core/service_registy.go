@@ -75,7 +75,6 @@ func (sr *ServiceRegistry) startHealthCheck(s *Service) {
 
 func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 	service, err := sr.GetServiceByPath(c.Path())
-
 	if err != nil {
 
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{

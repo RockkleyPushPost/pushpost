@@ -28,7 +28,7 @@ func main() {
 
 	if err != nil {
 
-		logger.Fatal(err)
+		logger.Fatal("failed to load config: ", err)
 	}
 
 	server := setup.NewFiber(fiber.Config{}, cors.Config{})
