@@ -1,10 +1,8 @@
-
 services:
-
   postgres:
     image: postgres:latest
     environment:
-      POSTGRES_DB: pushpost
+      POSTGRES_DB: pushpost_users
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pushword
     ports:
@@ -61,49 +59,59 @@ services:
       - "9092:9092"
     networks:
       - kafka-network
-
+  # SERVICES
   user_service:
     build:
       context: .
       dockerfile: internal/services/user_service/Dockerfile
     ports:
-      - "8080:8080"
-    volumes:
-      - ./configs:/configs
-    environment:
-      - USER_CONFIG=/configs/user_service.yaml
-    #      - DB_HOST=db
-    #      - DB_PORT=5432
-    #      - DB_USER=postgres
-    #      - DB_PASSWORD=secret
-    #      - DB_NAME=mydb
-    networks:
-      - monitoring
-
-    restart: always
-
-  auth_service:
-    build:
-      context: .
-      dockerfile: internal/services/auth_service/Dockerfile
-    ports:
       - "8081:8081"
     volumes:
       - ./configs:/configs
-    environment:
-      KAFKA_BROKER: "kafka:9092"
-    #    environment:
-    #        - USER_CONFIG=/configs/user_service.yaml
-    #      #      - DB_HOST=db
-    #      #      - DB_PORT=5432
-    #      #      - DB_USER=postgres
-    #      #      - DB_PASSWORD=secret
-    #      #      - DB_NAME=mydb
+    env_file:
+      - ./internal/services/user_service/.env
     networks:
       - monitoring
-      - kafka-network
 
-    restart: always
+  #    restart: always
+
+  api_gateway_service:
+    build:
+      context: .
+      dockerfile: internal/services/api_gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs:/configs
+    env_file:
+      - ./internal/services/api_gateway/.env
+    networks:
+      - monitoring
+
+#    restart: always
+
+#  auth_service:
+#    build:
+#      context: .
+#      dockerfile: internal/services/auth_service/Dockerfile
+#    ports:
+#      - "8081:8081"
+#    volumes:
+#      - ./configs:/configs
+#    environment:
+#      KAFKA_BROKER: "kafka:9092"
+#    #    environment:
+#    #        - USER_CONFIG=/configs/gateway_service.yaml
+#    #      #      - DB_HOST=db
+#    #      #      - DB_PORT=5432
+#    #      #      - DB_USER=postgres
+#    #      #      - DB_PASSWORD=secret
+#    #      #      - DB_NAME=mydb
+#    networks:
+#      - monitoring
+#      - kafka-network
+#
+#    restart: always
 
 networks:
   monitoring:

@@ -1,9 +1,10 @@
 database:
-  host: "postgres"
-  port: 5432
-  user: "postgres"
-  password: "pushword"
-  db_name: "pushpost_user"
+  host: ${USER_DB_HOST}
+  user: ${USER_DB_USER}
+  password: ${USER_DB_PASSWORD}
+  db_name: ${USER_DB_NAME}
+  port: ${USER_DB_PORT}
+  ssl_mode: ${USER_DB_SSL_MODE}
   schema: "public"
 
 server:
@@ -15,3 +16,4 @@ fiber:
 
 
 jwt_secret: "pushpost"
+

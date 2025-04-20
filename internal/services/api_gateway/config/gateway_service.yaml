@@ -1,8 +1,4 @@
 server:
-  address: "0.0.0.0"
-
-fiber:
   app_name: "PushPost API-gateway"
   port: 8080
-
-jwt_secret: "pushpost"
+  address: "0.0.0.0"

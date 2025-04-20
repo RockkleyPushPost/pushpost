@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"log"
 	"net/http"
 	"pushpost/internal/services/api_gateway/config"
 	"strings"
@@ -22,6 +23,9 @@ func NewServiceRegistry(serviceConfigs []config.ServiceConfig) *ServiceRegistry 
 	}
 
 	for _, serviceConfig := range serviceConfigs {
+		if serviceConfig.BaseURL == "" {
+			log.Fatal("empty baseURL for service: ", serviceConfig.Name)
+		}
 		service := &Service{
 			Client: NewClient(serviceConfig.BaseURL, serviceConfig.Timeout),
 			config: &serviceConfig,
@@ -75,13 +79,15 @@ func (sr *ServiceRegistry) startHealthCheck(s *Service) {
 
 func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 	service, err := sr.GetServiceByPath(c.Path())
+
 	if err != nil {
 
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
-			"error": "service unavailable",
+			"error": "service unavailable" + err.Error(),
 			"path":  c.Path(),
 		})
 	}
+	fmt.Println(service)
 
 	if service.config.HealthCheck != nil && !service.IsHealthy() {
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
@@ -101,7 +107,7 @@ func (sr *ServiceRegistry) ForwardRequest(c *fiber.Ctx) error {
 		Body:    c.Request().BodyStream(),
 		Headers: c.GetReqHeaders(),
 	}
-
+	fmt.Println(opts.Path, opts.Body)
 	var resp *http.Response
 	var lastErr error
 

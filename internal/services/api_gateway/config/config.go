@@ -17,7 +17,7 @@ type HealthcheckConfig struct {
 
 type ServiceConfig struct {
 	Name        string             `yaml:"name"`
-	BaseURL     string             `yaml:"baseURL"`
+	BaseURL     string             `yaml:"base_url"`
 	Prefix      string             `yaml:"prefix"`
 	HealthCheck *HealthcheckConfig `yaml:"health_check,omitempty"`
 	Timeout     time.Duration      `yaml:"timeout"`
@@ -35,31 +35,30 @@ type GatewayConfig struct {
 }
 
 func LoadServicesConfig(path string) ([]ServiceConfig, error) {
-	servicesCfg, err := os.Open(path)
-
+	file, err := os.ReadFile(path)
 	if err != nil {
-
 		return nil, err
 	}
-
-	defer servicesCfg.Close()
+	fmt.Printf("USER_SERVICE_URL environment variable: %s\n", os.Getenv("USER_SERVICE_URL"))
+	// Replace environment variables in the YAML content
+	replaced := os.ExpandEnv(string(file))
 
 	type Config struct {
 		Services []ServiceConfig `yaml:"services"`
 	}
+	fmt.Println("Configuration after environment variable expansion:")
+	fmt.Println(replaced)
 
 	var config Config
-
-	decoder := yaml.NewDecoder(servicesCfg)
-	if err := decoder.Decode(&config); err != nil {
-
+	// Unmarshal the YAML with environment variables replaced
+	err = yaml.Unmarshal([]byte(replaced), &config)
+	if err != nil {
 		return nil, fmt.Errorf("failed to decode yaml: %w", err)
 	}
 
 	if len(config.Services) == 0 {
-
 		return nil, fmt.Errorf("no services found in configuration")
 	}
-
+	fmt.Println(config.Services)
 	return config.Services, nil
 }

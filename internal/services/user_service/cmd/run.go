@@ -24,7 +24,8 @@ func main() {
 	defer cancel()
 
 	logger := lg.InitLogger(ServiceName)
-	cfg, err := config.LoadYamlConfig(os.Getenv("USER_CONFIG"))
+
+	cfg, err := config.LoadYamlConfig(os.Getenv("USER_SERVICE_CONFIG_PATH"))
 
 	if err != nil {
 

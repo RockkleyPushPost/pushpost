@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -19,11 +20,7 @@ import (
 	"time"
 )
 
-const (
-	ServiceName        = "api-gateway-service"
-	GatewayConfigPath  = "./internal/services/api_gateway/config/gateway_service.yaml"
-	ServicesConfigPath = "./internal/services/api_gateway/config/services.yaml"
-)
+const ServiceName = "api-gateway-service"
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -31,21 +28,22 @@ func main() {
 
 	srvLogger := lg.InitLogger(ServiceName)
 
-	cfg, err := config.LoadYamlConfig(GatewayConfigPath)
+	cfg, err := config.LoadYamlConfig(os.Getenv("API_GATEWAY_CONFIG_PATH"))
 
 	if err != nil {
 
 		log.Fatalf("failed to load gateway service config: %v", err)
 	}
 
-	servicesCfg, err := config2.LoadServicesConfig(ServicesConfigPath)
+	servicesCfg, err := config2.LoadServicesConfig(os.Getenv("API_GATEWAY_SERVICES_CONFIG_PATH"))
 
 	if err != nil {
 
-		log.Fatalf("failed to load gateway service config at %s", ServicesConfigPath)
+		log.Fatalf("failed to load gateway services config")
 	}
 
 	registry := core.NewServiceRegistry(servicesCfg)
+	fmt.Println(registry)
 	handler := gh.NewGatewayHandler(registry)
 
 	fiberConfig := fiber.Config{
@@ -79,12 +77,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	//go func() {
-	//	if err := app.Listen(":" + cfg.Server.Port); err != nil {
-	//		log.Fatalf("Error starting server: %v", err)
-	//	}
-	//}()
 
 	go handleShutdown(ctx, cancel, srv, srvLogger)
 

@@ -8,12 +8,12 @@ import (
 )
 
 type Config struct {
-	Host     string `json:"host" yaml:"host" env:"HOST"`
-	User     string `json:"user" yaml:"user" env:"USER"`
-	Password string `json:"password" yaml:"password" env:"PASSWORD"`
-	DbName   string `json:"db_name" yaml:"db_name" env:"DB_NAME"`
-	Port     string `json:"port" yaml:"port" env:"PORT"`
-	Schema   string `json:"schema" yaml:"schema" env:"SCHEMA"`
+	Host     string `yaml:"host"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DbName   string `yaml:"db_name"`
+	Port     string `yaml:"port"`
+	Schema   string `yaml:"schema"`
 }
 
 func (c *Config) Validate() error {
@@ -39,7 +39,7 @@ func NewDatabase(config Config) (*gorm.DB, error) {
 
 		return nil, err
 	}
-
+	fmt.Println(config)
 	dsn := getDsnFromConfig(config)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

@@ -1,7 +1,7 @@
 services:
-  - name: user
+  - name: user_service
     base_url: ${USER_SERVICE_URL}
-    prefix: /api/users
+    prefix: /api/user
     health_check:
       path: /health
       interval: 30s
@@ -13,9 +13,9 @@ services:
       attempts: 3
       delay: 1s
 
-  - name: notification
+  - name: notification_service
     base_url: ${NOTIFICATION_SERVICE_URL}
-    prefix: /api/notifications
+    prefix: /api/notification
     health_check:
       path: /api/health
       interval: 30s
@@ -27,9 +27,9 @@ services:
       attempts: 3
       delay: 1s
 
-  - name: post
+  - name: post_service
     base_url: ${POST_SERVICE_URL}
-    prefix: /api/posts
+    prefix: /api/post
     health_check:
       path: /api/health
       interval: 30s
