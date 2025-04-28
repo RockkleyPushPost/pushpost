@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -43,7 +42,6 @@ func main() {
 	}
 
 	registry := core.NewServiceRegistry(servicesCfg)
-	fmt.Println(registry)
 	handler := gh.NewGatewayHandler(registry)
 
 	fiberConfig := fiber.Config{
