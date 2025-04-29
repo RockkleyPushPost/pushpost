@@ -18,7 +18,7 @@ type ServerConfig struct {
 }
 
 func LoadYamlConfig(path string) (*Config, error) {
-	//config := Config{}
+	cfg := &Config{}
 
 	file, err := os.ReadFile(path)
 
@@ -28,7 +28,6 @@ func LoadYamlConfig(path string) (*Config, error) {
 	}
 
 	replaced := os.ExpandEnv(string(file))
-	cfg := &Config{}
 	err = yaml.Unmarshal([]byte(replaced), cfg)
 	return cfg, err
 	//decoder := yaml.NewDecoder(file)

@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 	"pushpost/pkg/database"
 )
@@ -10,7 +11,7 @@ func Database(conf *database.Config) (*gorm.DB, error) {
 
 	if err != nil {
 
-		return nil, err
+		return nil, fmt.Errorf("failed to create database: %w", err)
 	}
 
 	return db, err

@@ -19,10 +19,6 @@ func Setup(DI *di.DI, server *fiber.App, db *gorm.DB, cfg *config.Config) error 
 
 	jwtSecret := cfg.JwtSecret
 
-	// Auth
-	var authUseCase domain.AuthUseCase = &usecase.AuthUseCase{JwtSecret: jwtSecret}
-	var authHandler transport2.AuthHandler = &transport.AuthHandler{}
-
 	// User
 	var userRepository storage.UserRepository = &repository.UserRepository{}
 	var userUseCase domain.UserUseCase = &usecase.UserUseCase{JwtSecret: jwtSecret}
@@ -35,24 +31,17 @@ func Setup(DI *di.DI, server *fiber.App, db *gorm.DB, cfg *config.Config) error 
 
 	if err := DI.Register(
 		server, db, userRepository, userUseCase, userHandler, userHandler,
-		friendshipRepository, friendshipUseCase, friendshipHandler, authUseCase, authHandler); err != nil {
+		friendshipRepository, friendshipUseCase, friendshipHandler); err != nil {
 		log.Fatalf("failed to register %v", err)
 
 		return err
 	}
 
 	if err := DI.Bind(server, db, userRepository, userUseCase, userHandler, userHandler,
-		friendshipRepository, friendshipUseCase, friendshipHandler, authUseCase, authHandler); err != nil {
+		friendshipRepository, friendshipUseCase, friendshipHandler); err != nil {
 		log.Fatalf("failed to bind %v", err)
 
 		return err
-	}
-
-	authRoutes := routing.AuthRoutes{
-		Register:       authHandler.RegisterUser,
-		Login:          authHandler.Login,
-		VerifyEmailOTP: authHandler.VerifyEmailOTP,
-		SendNewOTP:     authHandler.SendNewOTP,
 	}
 
 	userRoutes := routing.UserRoutes{
@@ -72,13 +61,7 @@ func Setup(DI *di.DI, server *fiber.App, db *gorm.DB, cfg *config.Config) error 
 		FindIncomingFriendshipRequests:       friendshipHandler.FindIncomingFriendshipRequests,
 	}
 
-	if err := DI.RegisterRoutes(authRoutes, "/auth"); err != nil {
-		log.Fatalf("failed to register routes: %v", err)
-
-		return err
-	}
-
-	if err := DI.RegisterRoutes(userRoutes, "/user"); err != nil {
+	if err := DI.RegisterRoutes(userRoutes, ""); err != nil {
 		log.Fatalf("failed to register routes: %v", err)
 
 		return err

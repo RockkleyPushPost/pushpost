@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"pushpost/internal/config"
-	"pushpost/internal/services/user_service/entity"
 	"pushpost/internal/services/user_service/service"
 	"pushpost/internal/setup"
 	"pushpost/pkg/di"
@@ -46,9 +45,9 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	db.AutoMigrate(&entity.User{})
-	db.AutoMigrate(&entity.Friendship{})
-	db.AutoMigrate(&entity.FriendshipRequest{})
+	//db.AutoMigrate(&entity.User{})
+	//db.AutoMigrate(&entity.Friendship{})
+	//db.AutoMigrate(&entity.FriendshipRequest{})
 
 	DI := di.NewDI(server, cfg.JwtSecret)
 
