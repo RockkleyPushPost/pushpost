@@ -1,5 +1,6 @@
 <h1>PUSHPOST</h1>
 Polyrepository 
+
 <i>Pushpost is a lightweight social network without odd functionality. The project is currently in the MVP (Minimum Viable Product) stage.</i>
 
 <h3>Technology stack</h3>
